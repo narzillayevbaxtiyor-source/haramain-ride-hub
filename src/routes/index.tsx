@@ -28,9 +28,9 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { t } = useLanguage();
-  const routes = [
-    [t.makkah, t.jeddahAirport], [t.makkah, t.madinahAirport], [t.makkah, t.taifAirport],
-    [t.madinah, t.jeddahAirport], [t.madinah, t.taifAirport],
+  const routes: { from: string; to: string }[] = [
+    { from: t.makkah, to: t.jeddahAirport }, { from: t.makkah, to: t.madinahAirport }, { from: t.makkah, to: t.taifAirport },
+    { from: t.madinah, to: t.jeddahAirport }, { from: t.madinah, to: t.taifAirport },
   ];
   const benefits = [
     { icon: MousePointerClick, title: t.easy, text: t.easyText },
@@ -64,7 +64,7 @@ function Index() {
               <p className="mt-3 text-base leading-7 text-muted-foreground">{t.popularBody}</p>
             </div>
             <div className="mt-9 flex snap-x gap-4 overflow-x-auto pb-4 sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-3">
-              {routes.map(([from, to]) => <RouteCard key={`${from}-${to}`} from={from} to={to} />)}
+              {routes.map(({ from, to }) => <RouteCard key={`${from}-${to}`} from={from} to={to} />)}
             </div>
           </div>
         </section>
