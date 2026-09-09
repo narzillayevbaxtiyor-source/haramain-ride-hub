@@ -43,7 +43,7 @@ function Index() {
       <Header />
       <main>
         <HeroSection />
-        <section id="paths" className="relative z-10 -mt-16 pb-20 sm:-mt-20 sm:pb-28">
+        <section id="paths" className="relative z-10 py-20 sm:py-28">
           <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
             <div className="mb-7 text-center sm:mb-10">
               <h2 className="font-display text-3xl font-bold text-foreground sm:text-4xl">{t.choosePath}</h2>
