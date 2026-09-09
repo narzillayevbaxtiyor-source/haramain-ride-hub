@@ -19,6 +19,8 @@
  */
 
 @theme inline {
+  --font-sans: "Source Sans 3", "Noto Sans Arabic", sans-serif;
+  --font-display: "Outfit", "Noto Sans Arabic", sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -59,29 +61,45 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-hero: var(--hero);
+  --color-hero-foreground: var(--hero-foreground);
+  --color-hero-muted: var(--hero-muted);
+  --color-primary-soft: var(--primary-soft);
+  --color-section: var(--section);
+  --color-footer: var(--footer);
+  --shadow-card: var(--shadow-card);
+  --shadow-card-hover: var(--shadow-card-hover);
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
+  --radius: 0.75rem;
+  --background: oklch(0.985 0.008 92);
+  --foreground: oklch(0.235 0.03 173);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
+  --card-foreground: oklch(0.235 0.03 173);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
+  --popover-foreground: oklch(0.235 0.03 173);
+  --primary: oklch(0.43 0.095 166);
+  --primary-foreground: oklch(0.985 0.008 92);
+  --primary-soft: oklch(0.94 0.035 163);
+  --secondary: oklch(0.955 0.017 79);
+  --secondary-foreground: oklch(0.27 0.033 174);
+  --muted: oklch(0.96 0.01 91);
+  --muted-foreground: oklch(0.49 0.028 177);
+  --accent: oklch(0.76 0.115 82);
+  --accent-foreground: oklch(0.22 0.028 174);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
+  --border: oklch(0.89 0.018 91);
+  --input: oklch(0.89 0.018 91);
+  --ring: oklch(0.55 0.105 166);
+  --hero: oklch(0.24 0.052 174);
+  --hero-foreground: oklch(0.99 0.007 95);
+  --hero-muted: oklch(0.91 0.018 164);
+  --section: oklch(0.965 0.018 153);
+  --footer: oklch(0.955 0.012 91);
+  --shadow-card: 0 10px 35px -24px color-mix(in oklab, var(--foreground) 28%, transparent);
+  --shadow-card-hover: 0 22px 50px -26px color-mix(in oklab, var(--primary) 38%, transparent);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -140,5 +158,32 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
   }
+
+  html { scroll-behavior: smooth; }
+
+  h1, h2, h3 { letter-spacing: 0; }
+
+  :focus-visible { outline-color: var(--ring); }
+}
+
+@utility bg-hero-overlay {
+  background: linear-gradient(90deg, color-mix(in oklab, var(--hero) 94%, transparent) 0%, color-mix(in oklab, var(--hero) 76%, transparent) 42%, color-mix(in oklab, var(--hero) 12%, transparent) 72%);
+}
+
+[dir="rtl"] .bg-hero-overlay {
+  background: linear-gradient(270deg, color-mix(in oklab, var(--hero) 94%, transparent) 0%, color-mix(in oklab, var(--hero) 76%, transparent) 42%, color-mix(in oklab, var(--hero) 12%, transparent) 72%);
+}
+
+@media (max-width: 640px) {
+  .bg-hero-overlay {
+    background: linear-gradient(90deg, color-mix(in oklab, var(--hero) 90%, transparent) 0%, color-mix(in oklab, var(--hero) 65%, transparent) 72%, color-mix(in oklab, var(--hero) 28%, transparent) 100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
