@@ -1,10 +1,10 @@
 import { Languages } from "lucide-react";
 import { useLanguage, type Language } from "@/lib/i18n";
 
-const options: { value: Language; label: string; flag: string }[] = [
-  { value: "uz", label: "O‘zbekcha", flag: "🇺🇿" },
-  { value: "ru", label: "Русский", flag: "🇷🇺" },
-  { value: "ar", label: "العربية", flag: "🇸🇦" },
+const options: { value: Language; label: string }[] = [
+  { value: "uz", label: "Uzbek" },
+  { value: "ru", label: "Русский" },
+  { value: "ar", label: "العربية" },
 ];
 
 export function LanguageSelector({ compact = false }: { compact?: boolean }) {
@@ -21,7 +21,7 @@ export function LanguageSelector({ compact = false }: { compact?: boolean }) {
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
-            {compact ? option.flag : `${option.flag} ${option.label}`}
+            {option.label}
           </option>
         ))}
       </select>
