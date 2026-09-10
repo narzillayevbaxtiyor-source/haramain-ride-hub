@@ -14,16 +14,280 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bookings: {
+        Row: {
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string
+          date: string
+          destination_airport: Database["public"]["Enums"]["destination_airport"]
+          driver_id: string | null
+          id: string
+          luggage: number
+          offer_id: string | null
+          passenger_id: string | null
+          passengers: number
+          pickup_city: Database["public"]["Enums"]["pickup_city"]
+          pickup_location: string
+          price: number
+          ride_type: Database["public"]["Enums"]["ride_type"]
+          status: Database["public"]["Enums"]["booking_status"]
+          time: string
+        }
+        Insert: {
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          date: string
+          destination_airport: Database["public"]["Enums"]["destination_airport"]
+          driver_id?: string | null
+          id?: string
+          luggage?: number
+          offer_id?: string | null
+          passenger_id?: string | null
+          passengers: number
+          pickup_city: Database["public"]["Enums"]["pickup_city"]
+          pickup_location: string
+          price: number
+          ride_type: Database["public"]["Enums"]["ride_type"]
+          status?: Database["public"]["Enums"]["booking_status"]
+          time: string
+        }
+        Update: {
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          date?: string
+          destination_airport?: Database["public"]["Enums"]["destination_airport"]
+          driver_id?: string | null
+          id?: string
+          luggage?: number
+          offer_id?: string | null
+          passenger_id?: string | null
+          passengers?: number
+          pickup_city?: Database["public"]["Enums"]["pickup_city"]
+          pickup_location?: string
+          price?: number
+          ride_type?: Database["public"]["Enums"]["ride_type"]
+          status?: Database["public"]["Enums"]["booking_status"]
+          time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "driver_offers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "public_driver_offers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_passenger_id_fkey"
+            columns: ["passenger_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      driver_offers: {
+        Row: {
+          created_at: string
+          date: string
+          destination_airport: Database["public"]["Enums"]["destination_airport"]
+          driver_id: string
+          id: string
+          pickup_city: Database["public"]["Enums"]["pickup_city"]
+          pickup_location: string | null
+          price: number
+          ride_type: Database["public"]["Enums"]["ride_type"]
+          status: Database["public"]["Enums"]["offer_status"]
+          time: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          destination_airport: Database["public"]["Enums"]["destination_airport"]
+          driver_id: string
+          id?: string
+          pickup_city: Database["public"]["Enums"]["pickup_city"]
+          pickup_location?: string | null
+          price: number
+          ride_type: Database["public"]["Enums"]["ride_type"]
+          status?: Database["public"]["Enums"]["offer_status"]
+          time: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          destination_airport?: Database["public"]["Enums"]["destination_airport"]
+          driver_id?: string
+          id?: string
+          pickup_city?: Database["public"]["Enums"]["pickup_city"]
+          pickup_location?: string | null
+          price?: number
+          ride_type?: Database["public"]["Enums"]["ride_type"]
+          status?: Database["public"]["Enums"]["offer_status"]
+          time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_offers_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      drivers: {
+        Row: {
+          commission_balance: number
+          created_at: string
+          id: string
+          luggage_capacity: number
+          plate_number: string | null
+          rating: number | null
+          seats: number
+          status: Database["public"]["Enums"]["driver_status"]
+          user_id: string
+          vehicle_model: string | null
+          vehicle_type: string
+        }
+        Insert: {
+          commission_balance?: number
+          created_at?: string
+          id?: string
+          luggage_capacity?: number
+          plate_number?: string | null
+          rating?: number | null
+          seats?: number
+          status?: Database["public"]["Enums"]["driver_status"]
+          user_id: string
+          vehicle_model?: string | null
+          vehicle_type: string
+        }
+        Update: {
+          commission_balance?: number
+          created_at?: string
+          id?: string
+          luggage_capacity?: number
+          plate_number?: string | null
+          rating?: number | null
+          seats?: number
+          status?: Database["public"]["Enums"]["driver_status"]
+          user_id?: string
+          vehicle_model?: string | null
+          vehicle_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drivers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          id: string
+          language: string
+          name: string | null
+          phone: string | null
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          id: string
+          language?: string
+          name?: string | null
+          phone?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          language?: string
+          name?: string | null
+          phone?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      public_driver_offers: {
+        Row: {
+          date: string | null
+          destination_airport:
+            | Database["public"]["Enums"]["destination_airport"]
+            | null
+          driver_avatar_url: string | null
+          driver_id: string | null
+          driver_name: string | null
+          id: string | null
+          luggage_capacity: number | null
+          pickup_city: Database["public"]["Enums"]["pickup_city"] | null
+          pickup_location: string | null
+          price: number | null
+          rating: number | null
+          ride_type: Database["public"]["Enums"]["ride_type"] | null
+          seats: number | null
+          time: string | null
+          vehicle_model: string | null
+          vehicle_type: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_offers_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      app_role: "passenger" | "driver" | "admin"
+      booking_status:
+        | "pending"
+        | "driver_accepted"
+        | "driver_arriving"
+        | "driver_arrived"
+        | "trip_started"
+        | "completed"
+        | "cancelled"
+      destination_airport: "jeddah" | "madinah" | "taif"
+      driver_status: "pending" | "approved" | "suspended"
+      offer_status: "active" | "paused" | "expired"
+      pickup_city: "makkah" | "madinah"
+      ride_type: "private" | "shared"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +414,22 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["passenger", "driver", "admin"],
+      booking_status: [
+        "pending",
+        "driver_accepted",
+        "driver_arriving",
+        "driver_arrived",
+        "trip_started",
+        "completed",
+        "cancelled",
+      ],
+      destination_airport: ["jeddah", "madinah", "taif"],
+      driver_status: ["pending", "approved", "suspended"],
+      offer_status: ["active", "paused", "expired"],
+      pickup_city: ["makkah", "madinah"],
+      ride_type: ["private", "shared"],
+    },
   },
 } as const
