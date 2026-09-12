@@ -9,15 +9,15 @@ type Props = {
   step: number;
   total: number;
   title: string;
-  subtitle?: string;
+  subtitle?: string | undefined;
   children: ReactNode;
-  aside?: ReactNode;
-  error?: string | null;
-  onBack?: () => void;
-  onContinue?: () => void;
-  continueLabel?: string;
-  continueDisabled?: boolean;
-  hideNav?: boolean;
+  aside?: ReactNode | undefined;
+  error?: string | null | undefined;
+  onBack?: (() => void) | undefined;
+  onContinue?: (() => void) | undefined;
+  continueLabel?: string | undefined;
+  continueDisabled?: boolean | undefined;
+  hideNav?: boolean | undefined;
 };
 
 export function PassengerBookingLayout({

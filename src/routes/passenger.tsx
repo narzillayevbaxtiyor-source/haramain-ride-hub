@@ -162,7 +162,7 @@ function PassengerFlow() {
     { title: b.q4, subtitle: b.q4Sub },
     { title: b.q5, subtitle: b.q5Sub },
     { title: b.q6, subtitle: b.q6Sub },
-  ][progressStep - 1];
+  ][progressStep - 1] ?? { title: b.q1, subtitle: b.q1Sub };
 
   return (
     <PassengerBookingLayout
