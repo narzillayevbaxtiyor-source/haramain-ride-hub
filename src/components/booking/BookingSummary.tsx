@@ -2,7 +2,12 @@ import type { BookingDraft, DriverOffer } from "@/lib/booking";
 import { useBookingText } from "@/lib/i18n-booking";
 import { useBookingLabels } from "@/lib/booking-labels";
 
-type Props = { draft: BookingDraft; offer?: DriverOffer | null; compact?: boolean; onEdit?: () => void };
+type Props = {
+  draft: BookingDraft;
+  offer?: DriverOffer | null | undefined;
+  compact?: boolean | undefined;
+  onEdit?: (() => void) | undefined;
+};
 
 export function BookingSummary({ draft, offer, compact, onEdit }: Props) {
   const b = useBookingText();
