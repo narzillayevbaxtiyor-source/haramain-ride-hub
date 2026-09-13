@@ -12,7 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as BookingsRouteImport } from './routes/bookings'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DriverRouteImport } from './routes/driver'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as PassengerRouteImport } from './routes/passenger'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminActivityRouteImport } from './routes/admin.activity'
@@ -47,9 +49,19 @@ const BookingsRoute = BookingsRouteImport.update({
   path: '/bookings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DriverRoute = DriverRouteImport.update({
   id: '/driver',
   path: '/driver',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PassengerRoute = PassengerRouteImport.update({
@@ -147,7 +159,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/bookings': typeof BookingsRouteWithChildren
+  '/contact': typeof ContactRoute
   '/driver': typeof DriverRouteWithChildren
+  '/faq': typeof FaqRoute
   '/passenger': typeof PassengerRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/bookings': typeof AdminBookingsRouteWithChildren
@@ -169,6 +183,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/passenger': typeof PassengerRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/bookings': typeof AdminBookingsRouteWithChildren
@@ -193,7 +209,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/bookings': typeof BookingsRouteWithChildren
+  '/contact': typeof ContactRoute
   '/driver': typeof DriverRouteWithChildren
+  '/faq': typeof FaqRoute
   '/passenger': typeof PassengerRoute
   '/admin/activity': typeof AdminActivityRoute
   '/admin/bookings': typeof AdminBookingsRouteWithChildren
@@ -219,7 +237,9 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/bookings'
+    | '/contact'
     | '/driver'
+    | '/faq'
     | '/passenger'
     | '/admin/activity'
     | '/admin/bookings'
@@ -241,6 +261,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/contact'
+    | '/faq'
     | '/passenger'
     | '/admin/activity'
     | '/admin/bookings'
@@ -264,7 +286,9 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/bookings'
+    | '/contact'
     | '/driver'
+    | '/faq'
     | '/passenger'
     | '/admin/activity'
     | '/admin/bookings'
@@ -289,7 +313,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   BookingsRoute: typeof BookingsRouteWithChildren
+  ContactRoute: typeof ContactRoute
   DriverRoute: typeof DriverRouteWithChildren
+  FaqRoute: typeof FaqRoute
   PassengerRoute: typeof PassengerRoute
 }
 
@@ -316,11 +342,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BookingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/driver': {
       id: '/driver'
       path: '/driver'
       fullPath: '/driver'
       preLoaderRoute: typeof DriverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/passenger': {
@@ -537,7 +577,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   BookingsRoute: BookingsRouteWithChildren,
+  ContactRoute: ContactRoute,
   DriverRoute: DriverRouteWithChildren,
+  FaqRoute: FaqRoute,
   PassengerRoute: PassengerRoute,
 }
 export const routeTree = rootRouteImport

@@ -175,12 +175,21 @@ export type Translation = (typeof translations)["en"];
 type LanguageContextValue = { language: Language; setLanguage: (value: Language) => void; t: Translation };
 const LanguageContext = createContext<LanguageContextValue | undefined>(undefined);
 
+const STORAGE_KEY = "h2a-language";
+const supported: Language[] = ["en", "uz", "ru", "ar"];
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>("en");
 
   useEffect(() => {
+    const stored = window.localStorage.getItem(STORAGE_KEY) as Language | null;
+    if (stored && supported.includes(stored)) setLanguage(stored);
+  }, []);
+
+  useEffect(() => {
     document.documentElement.lang = language;
     document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
+    window.localStorage.setItem(STORAGE_KEY, language);
   }, [language]);
   const value = useMemo(() => ({ language, setLanguage, t: translations[language] as Translation }), [language]);
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
