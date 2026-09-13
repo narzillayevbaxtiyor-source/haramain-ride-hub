@@ -284,7 +284,7 @@ export type Database = {
         | "completed"
         | "cancelled"
       destination_airport: "jeddah" | "madinah" | "taif"
-      driver_status: "pending" | "approved" | "suspended"
+      driver_status: "pending" | "approved" | "suspended" | "active" | "blocked"
       offer_status: "active" | "paused" | "expired"
       pickup_city: "makkah" | "madinah"
       ride_type: "private" | "shared"
@@ -426,7 +426,7 @@ export const Constants = {
         "cancelled",
       ],
       destination_airport: ["jeddah", "madinah", "taif"],
-      driver_status: ["pending", "approved", "suspended"],
+      driver_status: ["pending", "approved", "suspended", "active", "blocked"],
       offer_status: ["active", "paused", "expired"],
       pickup_city: ["makkah", "madinah"],
       ride_type: ["private", "shared"],
