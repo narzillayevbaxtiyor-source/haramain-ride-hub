@@ -82,9 +82,13 @@ export async function fetchMatchingOffers(draft: BookingDraft): Promise<DriverOf
 }
 
 export async function createBooking(draft: BookingDraft, offer: DriverOffer) {
+  const { data: session } = await supabase.auth.getSession();
+  const passengerId = session.session?.user?.id ?? null;
+
   const { data, error } = await supabase
     .from("bookings")
     .insert({
+      passenger_id: passengerId,
       driver_id: offer.driver_id,
       offer_id: offer.id,
       pickup_city: draft.city!,
@@ -92,7 +96,11 @@ export async function createBooking(draft: BookingDraft, offer: DriverOffer) {
       destination_airport: draft.airport!,
       date: draft.date,
       time: draft.time,
+      adults: draft.adults,
+      children: draft.children,
       passengers: draft.adults + draft.children,
+      large_luggage: draft.largeLuggage,
+      hand_luggage: draft.handLuggage,
       luggage: draft.largeLuggage + draft.handLuggage,
       ride_type: draft.rideType!,
       price: offer.price,
@@ -104,3 +112,4 @@ export async function createBooking(draft: BookingDraft, offer: DriverOffer) {
   if (error) throw error;
   return data as { id: string };
 }
+
