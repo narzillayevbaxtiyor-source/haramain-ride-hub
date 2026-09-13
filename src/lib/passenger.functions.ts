@@ -157,18 +157,31 @@ export const createPassengerBooking = createServerFn({ method: "POST" })
 
     if (!profile) {
       const claims = context.claims as { email?: string; user_metadata?: { full_name?: string; name?: string; avatar_url?: string } };
-      await context.supabase.from("profiles").insert({
-        id: context.userId,
-        role: "passenger",
-        email: claims?.email ?? null,
-        name: claims?.user_metadata?.full_name ?? claims?.user_metadata?.name ?? null,
-        avatar_url: claims?.user_metadata?.avatar_url ?? null,
-      });
-      const { data: created } = await context.supabase
+      const { error: profileError } = await context.supabase
+        .from("profiles")
+        .upsert(
+          {
+            id: context.userId,
+            role: "passenger",
+            email: claims?.email ?? null,
+            name: claims?.user_metadata?.full_name ?? claims?.user_metadata?.name ?? null,
+            avatar_url: claims?.user_metadata?.avatar_url ?? null,
+          },
+          { onConflict: "id", ignoreDuplicates: true },
+        );
+
+      if (profileError) {
+        return { ok: false as const, reason: "failed" as CreateReason };
+      }
+
+      const { data: created, error: createdProfileError } = await context.supabase
         .from("profiles")
         .select("name, phone")
         .eq("id", context.userId)
         .maybeSingle();
+      if (createdProfileError || !created) {
+        return { ok: false as const, reason: "failed" as CreateReason };
+      }
       profile = created;
     }
 
@@ -197,10 +210,17 @@ export const createPassengerBooking = createServerFn({ method: "POST" })
         contact_name: profile?.name ?? null,
         contact_phone: profile?.phone ?? null,
       })
-      .select("id")
+      .select("id, passenger_id, driver_id, offer_id, status")
       .single();
 
-    if (error || !created) {
+    if (
+      error ||
+      !created ||
+      created.passenger_id !== context.userId ||
+      created.driver_id !== offer.driver_id ||
+      created.offer_id !== offer.id ||
+      created.status !== "pending"
+    ) {
       return { ok: false as const, reason: reasonFromDatabase(error?.message ?? "") };
     }
     return { ok: true as const, bookingId: created.id };

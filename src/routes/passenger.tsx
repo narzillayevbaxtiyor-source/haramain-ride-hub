@@ -75,10 +75,11 @@ function PassengerFlow() {
   };
 
   const bookingMutation = useMutation({
-    mutationFn: () =>
-      submitBooking({
+    mutationFn: () => {
+      if (!selected) throw new Error("offer_unavailable");
+      return submitBooking({
         data: {
-          offerId: selected!.id,
+          offerId: selected.id,
           pickupLocation: draft.pickupLocation,
           date: draft.date,
           time: draft.time,
@@ -87,7 +88,8 @@ function PassengerFlow() {
           largeLuggage: draft.largeLuggage,
           handLuggage: draft.handLuggage,
         },
-      }),
+      });
+    },
     onSuccess: (result) => {
       if (result.ok) {
         setError(null);
