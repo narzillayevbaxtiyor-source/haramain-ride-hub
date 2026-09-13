@@ -103,6 +103,63 @@ export type Database = {
           },
         ]
       }
+      commission_transactions: {
+        Row: {
+          amount_sar: number
+          amount_usd: number | null
+          booking_id: string | null
+          created_at: string
+          driver_id: string
+          id: string
+          payment_provider: string | null
+          payment_reference: string | null
+          status: Database["public"]["Enums"]["commission_txn_status"]
+          type: Database["public"]["Enums"]["commission_txn_type"]
+          updated_at: string
+        }
+        Insert: {
+          amount_sar: number
+          amount_usd?: number | null
+          booking_id?: string | null
+          created_at?: string
+          driver_id: string
+          id?: string
+          payment_provider?: string | null
+          payment_reference?: string | null
+          status?: Database["public"]["Enums"]["commission_txn_status"]
+          type: Database["public"]["Enums"]["commission_txn_type"]
+          updated_at?: string
+        }
+        Update: {
+          amount_sar?: number
+          amount_usd?: number | null
+          booking_id?: string | null
+          created_at?: string
+          driver_id?: string
+          id?: string
+          payment_provider?: string | null
+          payment_reference?: string | null
+          status?: Database["public"]["Enums"]["commission_txn_status"]
+          type?: Database["public"]["Enums"]["commission_txn_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commission_transactions_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commission_transactions_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       driver_offers: {
         Row: {
           created_at: string
@@ -156,39 +213,54 @@ export type Database = {
       drivers: {
         Row: {
           commission_balance: number
+          commission_balance_sar: number
+          commission_rate: number
           created_at: string
+          exterior_photo: string | null
           id: string
+          interior_photo: string | null
           luggage_capacity: number
           plate_number: string | null
           rating: number | null
           seats: number
           status: Database["public"]["Enums"]["driver_status"]
+          updated_at: string
           user_id: string
           vehicle_model: string | null
           vehicle_type: string
         }
         Insert: {
           commission_balance?: number
+          commission_balance_sar?: number
+          commission_rate?: number
           created_at?: string
+          exterior_photo?: string | null
           id?: string
+          interior_photo?: string | null
           luggage_capacity?: number
           plate_number?: string | null
           rating?: number | null
           seats?: number
           status?: Database["public"]["Enums"]["driver_status"]
+          updated_at?: string
           user_id: string
           vehicle_model?: string | null
           vehicle_type: string
         }
         Update: {
           commission_balance?: number
+          commission_balance_sar?: number
+          commission_rate?: number
           created_at?: string
+          exterior_photo?: string | null
           id?: string
+          interior_photo?: string | null
           luggage_capacity?: number
           plate_number?: string | null
           rating?: number | null
           seats?: number
           status?: Database["public"]["Enums"]["driver_status"]
+          updated_at?: string
           user_id?: string
           vehicle_model?: string | null
           vehicle_type?: string
@@ -203,6 +275,39 @@ export type Database = {
           },
         ]
       }
+      phone_verifications: {
+        Row: {
+          attempts: number
+          code_hash: string
+          consumed_at: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          phone: string
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          code_hash: string
+          consumed_at?: string | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          phone: string
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          code_hash?: string
+          consumed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          phone?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -212,6 +317,7 @@ export type Database = {
           language: string
           name: string | null
           phone: string | null
+          phone_verified: boolean
           role: Database["public"]["Enums"]["app_role"]
         }
         Insert: {
@@ -222,6 +328,7 @@ export type Database = {
           language?: string
           name?: string | null
           phone?: string | null
+          phone_verified?: boolean
           role?: Database["public"]["Enums"]["app_role"]
         }
         Update: {
@@ -232,6 +339,7 @@ export type Database = {
           language?: string
           name?: string | null
           phone?: string | null
+          phone_verified?: boolean
           role?: Database["public"]["Enums"]["app_role"]
         }
         Relationships: []
@@ -283,8 +391,10 @@ export type Database = {
         | "trip_started"
         | "completed"
         | "cancelled"
+      commission_txn_status: "pending" | "confirmed" | "failed"
+      commission_txn_type: "commission_charge" | "payment"
       destination_airport: "jeddah" | "madinah" | "taif"
-      driver_status: "pending" | "approved" | "suspended"
+      driver_status: "pending" | "approved" | "suspended" | "active" | "blocked"
       offer_status: "active" | "paused" | "expired"
       pickup_city: "makkah" | "madinah"
       ride_type: "private" | "shared"
@@ -425,8 +535,10 @@ export const Constants = {
         "completed",
         "cancelled",
       ],
+      commission_txn_status: ["pending", "confirmed", "failed"],
+      commission_txn_type: ["commission_charge", "payment"],
       destination_airport: ["jeddah", "madinah", "taif"],
-      driver_status: ["pending", "approved", "suspended"],
+      driver_status: ["pending", "approved", "suspended", "active", "blocked"],
       offer_status: ["active", "paused", "expired"],
       pickup_city: ["makkah", "madinah"],
       ride_type: ["private", "shared"],
