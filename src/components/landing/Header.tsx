@@ -14,20 +14,29 @@ export function Brand() {
   );
 }
 
+const navLinkClass = "shrink-0 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground";
+
 export function Header() {
   const { t } = useLanguage();
   return (
     <header className="absolute inset-x-0 top-0 z-30 border-b border-foreground/10 bg-background/80 backdrop-blur-xl">
-      <div className="mx-auto grid h-18 max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 sm:h-20 sm:px-6 lg:px-8">
+      <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 sm:h-20 sm:py-0 sm:px-6 lg:px-8">
         <Brand />
         <div className="flex items-center gap-5">
           <nav className="hidden items-center gap-6 md:flex" aria-label="Primary navigation">
-            <a href="#paths" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">{t.navPassenger}</a>
-            <a href="#paths" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">{t.navDriver}</a>
-            <a href="#routes" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">{t.navRoutes}</a>
+            <Link to="/passenger" className={navLinkClass}>{t.navPassenger}</Link>
+            <Link to="/driver" className={navLinkClass}>{t.navDriver}</Link>
+            <Link to="/" hash="routes" className={navLinkClass}>{t.navRoutes}</Link>
           </nav>
           <LanguageSelector compact />
         </div>
+        <nav className="col-span-2 -mx-1 flex items-center gap-5 overflow-x-auto px-1 pb-0.5 md:hidden" aria-label="Primary navigation">
+          <Link to="/passenger" className={navLinkClass}>{t.navPassenger}</Link>
+          <Link to="/driver" className={navLinkClass}>{t.navDriver}</Link>
+          <Link to="/" hash="routes" className={navLinkClass}>{t.navRoutes}</Link>
+          <Link to="/faq" className={navLinkClass}>{t.faq}</Link>
+          <Link to="/contact" className={navLinkClass}>{t.contact}</Link>
+        </nav>
       </div>
     </header>
   );
