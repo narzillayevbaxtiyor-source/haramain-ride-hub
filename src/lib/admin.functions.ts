@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database, Json } from "@/integrations/supabase/types";
 import type { Airport, PickupCity, RideType } from "@/lib/booking";
 import type { BookingStatus, DriverStatus } from "@/lib/driver.functions";
 
@@ -11,7 +13,7 @@ export type BlockReason = "outstanding_commission" | "admin_suspension" | "other
  * Verifies the caller holds the admin role. The check runs through the caller's
  * own authenticated client so RLS + has_role() decide, never the frontend.
  */
-async function assertAdmin(context: { supabase: { rpc: (fn: "has_role", args: { _user_id: string; _role: "admin" }) => Promise<{ data: unknown }> }; userId: string }) {
+async function assertAdmin(context: { supabase: SupabaseClient<Database>; userId: string }) {
   const { data } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
   if (data !== true) throw new Error("forbidden");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -26,16 +28,17 @@ async function logAction(
   action: string,
   target_table: string,
   target_id: string | null,
-  details?: Record<string, unknown>,
+  details?: Record<string, Json>,
 ) {
   await db.from("admin_activity_log").insert({
     admin_id: adminId,
     action,
     target_table,
     target_id,
-    details: details ?? null,
+    details: (details ?? {}) as Json,
   });
 }
+
 
 /** Tells the frontend whether the signed-in user may see the admin panel. */
 export const getAdminAccess = createServerFn({ method: "GET" })
@@ -269,15 +272,18 @@ export const setDriverStatus = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!driver) return { ok: false as const, reason: "not_found" as const };
 
-    const update: Record<string, unknown> = {};
+    const update: {
+      status: DriverStatus;
+      block_reason: string | null;
+      blocked_by_commission?: boolean;
+    } = { status: driver.status as DriverStatus, block_reason: null };
     switch (data.action) {
       case "approve":
-        update["status"] = "active";
-        update["block_reason"] = null;
+        update.status = "active";
         break;
       case "block":
-        update["status"] = "blocked";
-        update["block_reason"] = data.reason ?? "admin_suspension";
+        update.status = "blocked";
+        update.block_reason = data.reason ?? "admin_suspension";
         break;
       case "unblock":
       case "reactivate":
@@ -285,13 +291,12 @@ export const setDriverStatus = createServerFn({ method: "POST" })
         if (driver.blocked_by_commission && Number(driver.commission_balance_sar) >= COMMISSION_BLOCK_THRESHOLD) {
           return { ok: false as const, reason: "commission_outstanding" as const };
         }
-        update["status"] = "active";
-        update["block_reason"] = null;
-        update["blocked_by_commission"] = false;
+        update.status = "active";
+        update.blocked_by_commission = false;
         break;
       case "suspend":
-        update["status"] = "suspended";
-        update["block_reason"] = data.reason ?? "admin_suspension";
+        update.status = "suspended";
+        update.block_reason = data.reason ?? "admin_suspension";
         break;
     }
 
@@ -300,10 +305,11 @@ export const setDriverStatus = createServerFn({ method: "POST" })
 
     await logAction(db, context.userId, `driver_${data.action}`, "drivers", driver.id, {
       from: driver.status,
-      to: update["status"],
-      reason: update["block_reason"] ?? null,
+      to: update.status,
+      reason: update.block_reason,
     });
-    return { ok: true as const, status: update["status"] as DriverStatus };
+    return { ok: true as const, status: update.status };
+
   });
 
 export type AdminPassengerRow = {

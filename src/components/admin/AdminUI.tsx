@@ -136,7 +136,7 @@ export function ActionButton({
   );
 }
 
-export function PageHeading({ title, subtitle }: { title: string; subtitle?: string }) {
+export function PageHeading({ title, subtitle }: { title: string; subtitle?: string | undefined }) {
   return (
     <div className="mb-5">
       <h1 className="font-display text-2xl font-bold text-foreground sm:text-3xl">{title}</h1>

@@ -15,11 +15,14 @@ import { Route as BookingsRouteImport } from './routes/bookings'
 import { Route as DriverRouteImport } from './routes/driver'
 import { Route as PassengerRouteImport } from './routes/passenger'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminActivityRouteImport } from './routes/admin.activity'
 import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
 import { Route as AdminCommissionsRouteImport } from './routes/admin.commissions'
 import { Route as AdminDriversRouteImport } from './routes/admin.drivers'
 import { Route as AdminOffersRouteImport } from './routes/admin.offers'
 import { Route as AdminPassengersRouteImport } from './routes/admin.passengers'
+import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as BookingsIndexRouteImport } from './routes/bookings.index'
 import { Route as BookingsIdRouteImport } from './routes/bookings.$id'
 import { Route as DriverIndexRouteImport } from './routes/driver.index'
@@ -59,6 +62,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminActivityRoute = AdminActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminBookingsRoute = AdminBookingsRouteImport.update({
   id: '/bookings',
   path: '/bookings',
@@ -82,6 +90,16 @@ const AdminOffersRoute = AdminOffersRouteImport.update({
 const AdminPassengersRoute = AdminPassengersRouteImport.update({
   id: '/passengers',
   path: '/passengers',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AdminRoute,
 } as any)
 const BookingsIndexRoute = BookingsIndexRouteImport.update({
@@ -131,11 +149,14 @@ export interface FileRoutesByFullPath {
   '/bookings': typeof BookingsRouteWithChildren
   '/driver': typeof DriverRouteWithChildren
   '/passenger': typeof PassengerRoute
+  '/admin/activity': typeof AdminActivityRoute
   '/admin/bookings': typeof AdminBookingsRouteWithChildren
   '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/drivers': typeof AdminDriversRouteWithChildren
   '/admin/offers': typeof AdminOffersRoute
   '/admin/passengers': typeof AdminPassengersRoute
+  '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/bookings/$id': typeof BookingsIdRoute
   '/driver/dashboard': typeof DriverDashboardRoute
   '/driver/login': typeof DriverLoginRoute
@@ -149,11 +170,14 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/passenger': typeof PassengerRoute
+  '/admin/activity': typeof AdminActivityRoute
   '/admin/bookings': typeof AdminBookingsRouteWithChildren
   '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/drivers': typeof AdminDriversRouteWithChildren
   '/admin/offers': typeof AdminOffersRoute
   '/admin/passengers': typeof AdminPassengersRoute
+  '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/bookings/$id': typeof BookingsIdRoute
   '/driver/dashboard': typeof DriverDashboardRoute
   '/driver/login': typeof DriverLoginRoute
@@ -171,11 +195,14 @@ export interface FileRoutesById {
   '/bookings': typeof BookingsRouteWithChildren
   '/driver': typeof DriverRouteWithChildren
   '/passenger': typeof PassengerRoute
+  '/admin/activity': typeof AdminActivityRoute
   '/admin/bookings': typeof AdminBookingsRouteWithChildren
   '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/drivers': typeof AdminDriversRouteWithChildren
   '/admin/offers': typeof AdminOffersRoute
   '/admin/passengers': typeof AdminPassengersRoute
+  '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/bookings/$id': typeof BookingsIdRoute
   '/driver/dashboard': typeof DriverDashboardRoute
   '/driver/login': typeof DriverLoginRoute
@@ -194,11 +221,14 @@ export interface FileRouteTypes {
     | '/bookings'
     | '/driver'
     | '/passenger'
+    | '/admin/activity'
     | '/admin/bookings'
     | '/admin/commissions'
     | '/admin/drivers'
     | '/admin/offers'
     | '/admin/passengers'
+    | '/admin/payments'
+    | '/admin/settings'
     | '/bookings/$id'
     | '/driver/dashboard'
     | '/driver/login'
@@ -212,11 +242,14 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/passenger'
+    | '/admin/activity'
     | '/admin/bookings'
     | '/admin/commissions'
     | '/admin/drivers'
     | '/admin/offers'
     | '/admin/passengers'
+    | '/admin/payments'
+    | '/admin/settings'
     | '/bookings/$id'
     | '/driver/dashboard'
     | '/driver/login'
@@ -233,11 +266,14 @@ export interface FileRouteTypes {
     | '/bookings'
     | '/driver'
     | '/passenger'
+    | '/admin/activity'
     | '/admin/bookings'
     | '/admin/commissions'
     | '/admin/drivers'
     | '/admin/offers'
     | '/admin/passengers'
+    | '/admin/payments'
+    | '/admin/settings'
     | '/bookings/$id'
     | '/driver/dashboard'
     | '/driver/login'
@@ -301,6 +337,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/activity': {
+      id: '/admin/activity'
+      path: '/activity'
+      fullPath: '/admin/activity'
+      preLoaderRoute: typeof AdminActivityRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/bookings': {
       id: '/admin/bookings'
       path: '/bookings'
@@ -334,6 +377,20 @@ declare module '@tanstack/react-router' {
       path: '/passengers'
       fullPath: '/admin/passengers'
       preLoaderRoute: typeof AdminPassengersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/payments': {
+      id: '/admin/payments'
+      path: '/payments'
+      fullPath: '/admin/payments'
+      preLoaderRoute: typeof AdminPaymentsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/bookings/': {
@@ -420,20 +477,26 @@ const AdminDriversRouteWithChildren = AdminDriversRoute._addFileChildren(
 )
 
 interface AdminRouteChildren {
+  AdminActivityRoute: typeof AdminActivityRoute
   AdminBookingsRoute: typeof AdminBookingsRouteWithChildren
   AdminCommissionsRoute: typeof AdminCommissionsRoute
   AdminDriversRoute: typeof AdminDriversRouteWithChildren
   AdminOffersRoute: typeof AdminOffersRoute
   AdminPassengersRoute: typeof AdminPassengersRoute
+  AdminPaymentsRoute: typeof AdminPaymentsRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminActivityRoute: AdminActivityRoute,
   AdminBookingsRoute: AdminBookingsRouteWithChildren,
   AdminCommissionsRoute: AdminCommissionsRoute,
   AdminDriversRoute: AdminDriversRouteWithChildren,
   AdminOffersRoute: AdminOffersRoute,
   AdminPassengersRoute: AdminPassengersRoute,
+  AdminPaymentsRoute: AdminPaymentsRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
