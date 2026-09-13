@@ -14,6 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_activity_log: {
+        Row: {
+          action: string
+          admin_id: string
+          created_at: string
+          details: Json | null
+          id: string
+          target_id: string | null
+          target_table: string
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+          target_table: string
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+          target_table?: string
+        }
+        Relationships: []
+      }
+      admin_settings: {
+        Row: {
+          crypto_asset: string
+          crypto_network: string
+          id: boolean
+          min_payment_usd: number
+          paybis_enabled: boolean
+          updated_at: string
+          updated_by: string | null
+          usd_rate_sar: number
+          wallet_configured: boolean
+        }
+        Insert: {
+          crypto_asset?: string
+          crypto_network?: string
+          id?: boolean
+          min_payment_usd?: number
+          paybis_enabled?: boolean
+          updated_at?: string
+          updated_by?: string | null
+          usd_rate_sar?: number
+          wallet_configured?: boolean
+        }
+        Update: {
+          crypto_asset?: string
+          crypto_network?: string
+          id?: boolean
+          min_payment_usd?: number
+          paybis_enabled?: boolean
+          updated_at?: string
+          updated_by?: string | null
+          usd_rate_sar?: number
+          wallet_configured?: boolean
+        }
+        Relationships: []
+      }
       booking_status_history: {
         Row: {
           booking_id: string
@@ -277,6 +343,8 @@ export type Database = {
       }
       drivers: {
         Row: {
+          block_reason: string | null
+          blocked_by_commission: boolean
           commission_balance: number
           commission_balance_sar: number
           commission_rate: number
@@ -295,6 +363,8 @@ export type Database = {
           vehicle_type: string
         }
         Insert: {
+          block_reason?: string | null
+          blocked_by_commission?: boolean
           commission_balance?: number
           commission_balance_sar?: number
           commission_rate?: number
@@ -313,6 +383,8 @@ export type Database = {
           vehicle_type: string
         }
         Update: {
+          block_reason?: string | null
+          blocked_by_commission?: boolean
           commission_balance?: number
           commission_balance_sar?: number
           commission_rate?: number
@@ -441,6 +513,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_status: Database["public"]["Enums"]["account_status"]
           avatar_url: string | null
           created_at: string
           email: string | null
@@ -452,6 +525,7 @@ export type Database = {
           role: Database["public"]["Enums"]["app_role"]
         }
         Insert: {
+          account_status?: Database["public"]["Enums"]["account_status"]
           avatar_url?: string | null
           created_at?: string
           email?: string | null
@@ -463,6 +537,7 @@ export type Database = {
           role?: Database["public"]["Enums"]["app_role"]
         }
         Update: {
+          account_status?: Database["public"]["Enums"]["account_status"]
           avatar_url?: string | null
           created_at?: string
           email?: string | null
@@ -472,6 +547,27 @@ export type Database = {
           phone?: string | null
           phone_verified?: boolean
           role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
         }
         Relationships: []
       }
@@ -510,9 +606,16 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
+      account_status: "active" | "suspended"
       app_role: "passenger" | "driver" | "admin"
       booking_status:
         | "pending"
@@ -663,6 +766,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      account_status: ["active", "suspended"],
       app_role: ["passenger", "driver", "admin"],
       booking_status: [
         "pending",
