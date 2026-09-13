@@ -272,15 +272,18 @@ export const setDriverStatus = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!driver) return { ok: false as const, reason: "not_found" as const };
 
-    const update: Record<string, unknown> = {};
+    const update: {
+      status: DriverStatus;
+      block_reason: string | null;
+      blocked_by_commission?: boolean;
+    } = { status: driver.status as DriverStatus, block_reason: null };
     switch (data.action) {
       case "approve":
-        update["status"] = "active";
-        update["block_reason"] = null;
+        update.status = "active";
         break;
       case "block":
-        update["status"] = "blocked";
-        update["block_reason"] = data.reason ?? "admin_suspension";
+        update.status = "blocked";
+        update.block_reason = data.reason ?? "admin_suspension";
         break;
       case "unblock":
       case "reactivate":
@@ -288,13 +291,12 @@ export const setDriverStatus = createServerFn({ method: "POST" })
         if (driver.blocked_by_commission && Number(driver.commission_balance_sar) >= COMMISSION_BLOCK_THRESHOLD) {
           return { ok: false as const, reason: "commission_outstanding" as const };
         }
-        update["status"] = "active";
-        update["block_reason"] = null;
-        update["blocked_by_commission"] = false;
+        update.status = "active";
+        update.blocked_by_commission = false;
         break;
       case "suspend":
-        update["status"] = "suspended";
-        update["block_reason"] = data.reason ?? "admin_suspension";
+        update.status = "suspended";
+        update.block_reason = data.reason ?? "admin_suspension";
         break;
     }
 
@@ -303,10 +305,11 @@ export const setDriverStatus = createServerFn({ method: "POST" })
 
     await logAction(db, context.userId, `driver_${data.action}`, "drivers", driver.id, {
       from: driver.status,
-      to: update["status"],
-      reason: update["block_reason"] ?? null,
+      to: update.status,
+      reason: update.block_reason,
     });
-    return { ok: true as const, status: update["status"] as DriverStatus };
+    return { ok: true as const, status: update.status };
+
   });
 
 export type AdminPassengerRow = {
