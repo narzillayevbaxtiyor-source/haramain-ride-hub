@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { PassengerBookingLayout } from "@/components/booking/PassengerBookingLayout";
 import { LocationSelector } from "@/components/booking/LocationSelector";
@@ -14,8 +15,12 @@ import { OfferFilters, type OfferSort } from "@/components/booking/OfferFilters"
 import { DriverOfferCard } from "@/components/booking/DriverOfferCard";
 import { EmptyOffersState } from "@/components/booking/EmptyOffersState";
 import { BookingSummary } from "@/components/booking/BookingSummary";
-import { createBooking, emptyDraft, fetchMatchingOffers, type BookingDraft, type DriverOffer, type RideType } from "@/lib/booking";
+import { SignInGate } from "@/components/booking/SignInGate";
+import { useDriverSession } from "@/hooks/useDriverSession";
+import { createPassengerBooking } from "@/lib/passenger.functions";
+import { emptyDraft, fetchMatchingOffers, type BookingDraft, type DriverOffer, type RideType } from "@/lib/booking";
 import { useBookingText } from "@/lib/i18n-booking";
+import { useMyBookingText } from "@/lib/i18n-mybookings";
 
 export const Route = createFileRoute("/passenger")({
   head: () => ({
@@ -36,6 +41,9 @@ const TOTAL_STEPS = 6;
 
 function PassengerFlow() {
   const b = useBookingText();
+  const m = useMyBookingText();
+  const { user, ready } = useDriverSession();
+  const submitBooking = useServerFn(createPassengerBooking);
   const [step, setStep] = useState(1);
   const [draft, setDraft] = useState<BookingDraft>(emptyDraft);
   const [error, setError] = useState<string | null>(null);
@@ -56,9 +64,44 @@ function PassengerFlow() {
     enabled: step >= 6 && Boolean(draft.city && draft.airport && draft.date && draft.time && draft.rideType),
   });
 
+  const bookingErrors: Record<string, string> = {
+    offer_unavailable: m.errOfferUnavailable,
+    driver_unavailable: m.errDriverUnavailable,
+    duplicate_booking: m.errDuplicate,
+    booking_conflict: m.errConflict,
+    capacity: m.errCapacity,
+    invalid: b.bookingError,
+    failed: b.bookingError,
+  };
+
   const bookingMutation = useMutation({
-    mutationFn: () => createBooking(draft, selected!),
-    onSuccess: (data) => setBookingId(data.id),
+    mutationFn: () =>
+      submitBooking({
+        data: {
+          offerId: selected!.id,
+          pickupLocation: draft.pickupLocation,
+          date: draft.date,
+          time: draft.time,
+          adults: draft.adults,
+          children: draft.children,
+          largeLuggage: draft.largeLuggage,
+          handLuggage: draft.handLuggage,
+        },
+      }),
+    onSuccess: (result) => {
+      if (result.ok) {
+        setError(null);
+        setBookingId(result.bookingId);
+        return;
+      }
+      setError(bookingErrors[result.reason] ?? b.bookingError);
+      // The offer or driver is no longer bookable: send the passenger back to the live list.
+      if (result.reason === "offer_unavailable" || result.reason === "driver_unavailable" || result.reason === "booking_conflict") {
+        setSelected(null);
+        setStep(6);
+        void offersQuery.refetch();
+      }
+    },
     onError: () => setError(b.bookingError),
   });
 
@@ -112,25 +155,31 @@ function PassengerFlow() {
 
   if (bookingId) {
     return (
-      <PassengerBookingLayout step={TOTAL_STEPS} total={TOTAL_STEPS} title={b.bookingDone} subtitle={b.bookingDoneText} hideNav aside={summary}>
+      <PassengerBookingLayout step={TOTAL_STEPS} total={TOTAL_STEPS} title={m.requestSent} subtitle={m.requestSentText} hideNav aside={summary}>
         <div className="space-y-6">
           <span className="grid size-14 place-items-center rounded-md bg-primary-soft text-primary"><CheckCircle2 className="size-7" aria-hidden="true" /></span>
           <div className="rounded-md border border-border bg-secondary px-4 py-3">
             <p className="text-xs font-bold uppercase text-muted-foreground">{b.bookingRef}</p>
             <p className="mt-1 font-mono text-sm font-semibold text-foreground" dir="ltr">{bookingId}</p>
+            <p className="mt-3 text-xs font-bold uppercase text-muted-foreground">{m.currentStatus}</p>
+            <p className="mt-1 text-sm font-semibold text-foreground">{m.sPending}</p>
           </div>
           <BookingSummary draft={draft} offer={selected} />
           <div className="flex flex-col gap-3 sm:flex-row">
+            <Link
+              to="/bookings/$id"
+              params={{ id: bookingId }}
+              className="inline-flex min-h-12 items-center justify-center rounded-md bg-primary px-6 text-sm font-bold text-primary-foreground hover:bg-primary/90"
+            >
+              {m.viewBooking}
+            </Link>
             <button
               type="button"
               onClick={() => { setBookingId(null); setSelected(null); setDraft(emptyDraft); setStep(1); }}
-              className="inline-flex min-h-12 items-center justify-center rounded-md bg-primary px-6 text-sm font-bold text-primary-foreground hover:bg-primary/90"
+              className="inline-flex min-h-12 items-center justify-center rounded-md border border-input px-6 text-sm font-bold text-foreground hover:bg-secondary"
             >
               {b.newBooking}
             </button>
-            <Link to="/" className="inline-flex min-h-12 items-center justify-center rounded-md border border-input px-6 text-sm font-bold text-foreground hover:bg-secondary">
-              {b.back}
-            </Link>
           </div>
         </div>
       </PassengerBookingLayout>
@@ -138,6 +187,7 @@ function PassengerFlow() {
   }
 
   if (step === 7 && selected) {
+    const signedIn = ready && Boolean(user);
     return (
       <PassengerBookingLayout
         step={TOTAL_STEPS}
@@ -145,12 +195,15 @@ function PassengerFlow() {
         title={b.confirmTitle}
         error={error}
         onBack={() => { setSelected(null); setStep(6); }}
-        onContinue={() => bookingMutation.mutate()}
+        onContinue={signedIn ? () => bookingMutation.mutate() : undefined}
         continueLabel={bookingMutation.isPending ? b.saving : b.confirmBooking}
         continueDisabled={bookingMutation.isPending}
         aside={summary}
       >
-        <BookingSummary draft={draft} offer={selected} />
+        <div className="space-y-6">
+          <BookingSummary draft={draft} offer={selected} />
+          {ready && !user ? <SignInGate redirectTo="/passenger" /> : null}
+        </div>
       </PassengerBookingLayout>
     );
   }

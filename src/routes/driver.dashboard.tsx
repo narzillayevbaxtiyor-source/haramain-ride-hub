@@ -9,6 +9,7 @@ import { BookingCard } from "@/components/driver/BookingCard";
 import { useDriverSession } from "@/hooks/useDriverSession";
 import { useDriverText } from "@/lib/i18n-driver";
 import { useDashboardText } from "@/lib/i18n-dashboard";
+import { useMyBookingText } from "@/lib/i18n-mybookings";
 import { useBookingLabels } from "@/lib/booking-labels";
 import { supabase } from "@/integrations/supabase/client";
 import type { Airport, PickupCity, RideType } from "@/lib/booking";
@@ -53,11 +54,12 @@ const AIRPORTS: Airport[] = ["jeddah", "madinah", "taif"];
 
 const ACTIVE_STATUSES: BookingStatus[] = ["driver_accepted", "driver_arriving", "driver_arrived", "trip_started"];
 
-type Section = "overview" | "requests" | "active" | "completed" | "offers" | "profile" | "commission";
+type Section = "overview" | "requests" | "active" | "completed" | "history" | "offers" | "profile" | "commission";
 
 function DriverDashboard() {
   const d = useDriverText();
   const t = useDashboardText();
+  const mb = useMyBookingText();
   const labels = useBookingLabels();
   const navigate = useNavigate();
   const { user, ready } = useDriverSession();
@@ -153,6 +155,7 @@ function DriverDashboard() {
     invalid_price: d.priceHint,
     invalid_transition: t.invalidTransition,
     duplicate: t.duplicateOffer,
+    conflict: mb.errConflict,
     not_found: t.updateFailed,
   };
 
@@ -182,12 +185,14 @@ function DriverDashboard() {
   const pending = bookings.filter((booking) => booking.status === "pending");
   const active = bookings.filter((booking) => ACTIVE_STATUSES.includes(booking.status));
   const completed = bookings.filter((booking) => booking.status === "completed");
+  const history = bookings.filter((booking) => booking.status === "cancelled" || booking.status === "rejected");
 
   const tabs: { key: Section; label: string; count?: number }[] = [
     { key: "overview", label: t.overview },
     { key: "requests", label: t.requests, count: pending.length },
     { key: "active", label: t.active, count: active.length },
     { key: "completed", label: t.completed, count: completed.length },
+    { key: "history", label: mb.tabCancelled, count: history.length },
     { key: "offers", label: t.offers, count: offers.length },
     { key: "profile", label: t.vehicleProfile },
     { key: "commission", label: t.commission },
@@ -350,7 +355,10 @@ function DriverDashboard() {
                   busy={busy}
                   canAct={!restricted}
                   onAccept={() => void run(() => respond({ data: { id: booking.id, accept: true } }))}
-                  onReject={() => void run(() => respond({ data: { id: booking.id, accept: false } }))}
+                  onReject={() => {
+                    const reason = window.prompt(mb.cancelReason) ?? "";
+                    void run(() => respond({ data: { id: booking.id, accept: false, reason } }));
+                  }}
                 />
               ))}
             </ul>
@@ -368,7 +376,10 @@ function DriverDashboard() {
                   booking={booking}
                   busy={busy}
                   onAdvance={(status) => void run(() => advance({ data: { id: booking.id, status } }))}
-                  onCancel={() => void run(() => advance({ data: { id: booking.id, status: "cancelled" } }))}
+                  onCancel={() => {
+                    const reason = window.prompt(mb.cancelReason) ?? "";
+                    void run(() => advance({ data: { id: booking.id, status: "cancelled", reason } }));
+                  }}
                 />
               ))}
             </ul>
@@ -384,6 +395,17 @@ function DriverDashboard() {
             </ul>
           )
         ) : null}
+
+        {section === "history" ? (
+          history.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{mb.noBookingsText}</p>
+          ) : (
+            <ul className="space-y-4">
+              {history.map((booking) => <BookingCard key={booking.id} booking={booking} />)}
+            </ul>
+          )
+        ) : null}
+
 
         {section === "offers" ? (
           <section>
