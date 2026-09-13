@@ -16,6 +16,7 @@ import { Route as DriverRouteImport } from './routes/driver'
 import { Route as PassengerRouteImport } from './routes/passenger'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
+import { Route as AdminCommissionsRouteImport } from './routes/admin.commissions'
 import { Route as AdminDriversRouteImport } from './routes/admin.drivers'
 import { Route as AdminOffersRouteImport } from './routes/admin.offers'
 import { Route as AdminPassengersRouteImport } from './routes/admin.passengers'
@@ -61,6 +62,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AdminBookingsRoute = AdminBookingsRouteImport.update({
   id: '/bookings',
   path: '/bookings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCommissionsRoute = AdminCommissionsRouteImport.update({
+  id: '/commissions',
+  path: '/commissions',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminDriversRoute = AdminDriversRouteImport.update({
@@ -126,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/driver': typeof DriverRouteWithChildren
   '/passenger': typeof PassengerRoute
   '/admin/bookings': typeof AdminBookingsRouteWithChildren
+  '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/drivers': typeof AdminDriversRouteWithChildren
   '/admin/offers': typeof AdminOffersRoute
   '/admin/passengers': typeof AdminPassengersRoute
@@ -143,6 +150,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/passenger': typeof PassengerRoute
   '/admin/bookings': typeof AdminBookingsRouteWithChildren
+  '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/drivers': typeof AdminDriversRouteWithChildren
   '/admin/offers': typeof AdminOffersRoute
   '/admin/passengers': typeof AdminPassengersRoute
@@ -164,6 +172,7 @@ export interface FileRoutesById {
   '/driver': typeof DriverRouteWithChildren
   '/passenger': typeof PassengerRoute
   '/admin/bookings': typeof AdminBookingsRouteWithChildren
+  '/admin/commissions': typeof AdminCommissionsRoute
   '/admin/drivers': typeof AdminDriversRouteWithChildren
   '/admin/offers': typeof AdminOffersRoute
   '/admin/passengers': typeof AdminPassengersRoute
@@ -186,6 +195,7 @@ export interface FileRouteTypes {
     | '/driver'
     | '/passenger'
     | '/admin/bookings'
+    | '/admin/commissions'
     | '/admin/drivers'
     | '/admin/offers'
     | '/admin/passengers'
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/'
     | '/passenger'
     | '/admin/bookings'
+    | '/admin/commissions'
     | '/admin/drivers'
     | '/admin/offers'
     | '/admin/passengers'
@@ -223,6 +234,7 @@ export interface FileRouteTypes {
     | '/driver'
     | '/passenger'
     | '/admin/bookings'
+    | '/admin/commissions'
     | '/admin/drivers'
     | '/admin/offers'
     | '/admin/passengers'
@@ -294,6 +306,13 @@ declare module '@tanstack/react-router' {
       path: '/bookings'
       fullPath: '/admin/bookings'
       preLoaderRoute: typeof AdminBookingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/commissions': {
+      id: '/admin/commissions'
+      path: '/commissions'
+      fullPath: '/admin/commissions'
+      preLoaderRoute: typeof AdminCommissionsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/drivers': {
@@ -402,6 +421,7 @@ const AdminDriversRouteWithChildren = AdminDriversRoute._addFileChildren(
 
 interface AdminRouteChildren {
   AdminBookingsRoute: typeof AdminBookingsRouteWithChildren
+  AdminCommissionsRoute: typeof AdminCommissionsRoute
   AdminDriversRoute: typeof AdminDriversRouteWithChildren
   AdminOffersRoute: typeof AdminOffersRoute
   AdminPassengersRoute: typeof AdminPassengersRoute
@@ -410,6 +430,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminBookingsRoute: AdminBookingsRouteWithChildren,
+  AdminCommissionsRoute: AdminCommissionsRoute,
   AdminDriversRoute: AdminDriversRouteWithChildren,
   AdminOffersRoute: AdminOffersRoute,
   AdminPassengersRoute: AdminPassengersRoute,
