@@ -1,9 +1,51 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
-export type Language = "uz" | "ru" | "ar";
+export type Language = "en" | "uz" | "ru" | "ar";
 
 const translations = {
+  en: {
+    language: "English",
+    navPassenger: "Passenger",
+    navDriver: "Driver",
+    navRoutes: "Routes",
+    eyebrow: "From Makkah and Madinah to the airports",
+    heroTitle: "Haramain 2 Airport",
+    heroSubtitle: "Easy airport transfers from Makkah and Madinah",
+    heroBody: "Choose comfortable transport for your trip. We bring passengers and local drivers together in one place.",
+    choosePath: "How would you like to continue?",
+    choosePathBody: "Pick the option that fits your trip.",
+    passenger: "I am a passenger",
+    passengerText: "Book a car to the airport",
+    driver: "I am a driver",
+    driverText: "Join as a driver",
+    continue: "Continue",
+    popular: "Popular airport transfers",
+    popularBody: "The most requested airport routes from Makkah and Madinah.",
+    makkah: "Makkah",
+    madinah: "Madinah",
+    jeddahAirport: "Jeddah Airport",
+    madinahAirport: "Madinah Airport",
+    taifAirport: "Taif Airport",
+    why: "Why Haramain 2 Airport?",
+    whyBody: "Built to make your airport trip simple and comfortable.",
+    easy: "Simple booking",
+    easyText: "Choose your route in just a few steps.",
+    chooseDriver: "Choose your driver",
+    chooseDriverText: "Select the driver that suits your trip yourself.",
+    rideTypes: "Private and shared rides",
+    rideTypesText: "Choose the ride format that fits your needs.",
+    prices: "Competitive prices",
+    pricesText: "Compare different trip options with ease.",
+    footerText: "Comfortable airport transfers from Makkah and Madinah.",
+    faq: "FAQ",
+    contact: "Contact",
+    comingSoon: "Coming soon",
+    backHome: "Back to home",
+    placeholderPassenger: "The passenger booking flow will be available in the next step.",
+    placeholderDriver: "Driver registration will be available in the next step.",
+  },
   uz: {
+
     language: "O‘zbekcha",
     navPassenger: "Yo‘lovchi",
     navDriver: "Haydovchi",
@@ -128,13 +170,14 @@ const translations = {
   },
 } as const;
 
-export type Translation = (typeof translations)["uz"];
+export type Translation = (typeof translations)["en"];
 
 type LanguageContextValue = { language: Language; setLanguage: (value: Language) => void; t: Translation };
 const LanguageContext = createContext<LanguageContextValue | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>("uz");
+  const [language, setLanguage] = useState<Language>("en");
+
   useEffect(() => {
     document.documentElement.lang = language;
     document.documentElement.dir = language === "ar" ? "rtl" : "ltr";

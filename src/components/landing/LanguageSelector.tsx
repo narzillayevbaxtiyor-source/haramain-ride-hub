@@ -2,10 +2,12 @@ import { Languages } from "lucide-react";
 import { useLanguage, type Language } from "@/lib/i18n";
 
 const options: { value: Language; label: string }[] = [
+  { value: "en", label: "English" },
   { value: "uz", label: "Uzbek" },
   { value: "ru", label: "Русский" },
   { value: "ar", label: "العربية" },
 ];
+
 
 export function LanguageSelector({ compact = false }: { compact?: boolean }) {
   const { language, setLanguage } = useLanguage();

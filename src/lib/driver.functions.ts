@@ -390,3 +390,250 @@ export const listCommissionTransactions = createServerFn({ method: "GET" })
       .limit(20);
     return (data ?? []) as CommissionRow[];
   });
+
+/* ---------------------------------------------------------------------------
+ * Booking management (driver side)
+ * ------------------------------------------------------------------------- */
+
+export type BookingStatus =
+  | "pending"
+  | "driver_accepted"
+  | "driver_arriving"
+  | "driver_arrived"
+  | "trip_started"
+  | "completed"
+  | "cancelled"
+  | "rejected";
+
+export type DriverBooking = {
+  id: string;
+  status: BookingStatus;
+  pickup_city: PickupCity;
+  pickup_location: string;
+  destination_airport: Airport;
+  date: string;
+  time: string;
+  adults: number;
+  children: number;
+  passengers: number;
+  large_luggage: number;
+  hand_luggage: number;
+  luggage: number;
+  ride_type: RideType;
+  price: number;
+  contact_name: string | null;
+  contact_phone: string | null;
+  created_at: string;
+};
+
+const BOOKING_COLUMNS =
+  "id, status, pickup_city, pickup_location, destination_airport, date, time, adults, children, passengers, large_luggage, hand_luggage, luggage, ride_type, price, contact_name, contact_phone, created_at";
+
+/** Every booking assigned to the signed-in driver. RLS keeps other drivers' bookings out. */
+export const listDriverBookings = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<DriverBooking[]> => {
+    const { data: driver } = await context.supabase
+      .from("drivers")
+      .select("id")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (!driver) return [];
+
+    const { data } = await context.supabase
+      .from("bookings")
+      .select(BOOKING_COLUMNS)
+      .eq("driver_id", driver.id)
+      .order("created_at", { ascending: false });
+    return (data ?? []) as unknown as DriverBooking[];
+  });
+
+/** Only an active driver may accept. Rejection frees the passenger to pick another offer. */
+export const respondToBooking = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id: string; accept: boolean }) => input)
+  .handler(async ({ data, context }) => {
+    const { data: driver } = await context.supabase
+      .from("drivers")
+      .select("id, status")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (!driver) return { ok: false as const, reason: "not_driver" as const };
+    if (data.accept && !["active", "approved"].includes(driver.status)) {
+      return { ok: false as const, reason: "blocked" as const };
+    }
+
+    const { data: booking } = await context.supabase
+      .from("bookings")
+      .select("id, status")
+      .eq("id", data.id)
+      .eq("driver_id", driver.id)
+      .maybeSingle();
+    if (!booking) return { ok: false as const, reason: "not_found" as const };
+    if (booking.status !== "pending") return { ok: false as const, reason: "invalid_transition" as const };
+
+    const { error } = await context.supabase
+      .from("bookings")
+      .update({ status: data.accept ? "driver_accepted" : "rejected" })
+      .eq("id", data.id);
+    if (error) return { ok: false as const, reason: "invalid_transition" as const };
+    return { ok: true as const };
+  });
+
+const DRIVER_STATUS_STEPS: BookingStatus[] = [
+  "driver_arriving",
+  "driver_arrived",
+  "trip_started",
+  "completed",
+  "cancelled",
+];
+
+/** Sequential status updates. The database also rejects invalid jumps. */
+export const updateBookingStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id: string; status: BookingStatus }) => input)
+  .handler(async ({ data, context }) => {
+    if (!DRIVER_STATUS_STEPS.includes(data.status)) return { ok: false as const, reason: "invalid_transition" as const };
+
+    const { data: driver } = await context.supabase
+      .from("drivers")
+      .select("id, status")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (!driver) return { ok: false as const, reason: "not_driver" as const };
+    if (["blocked", "suspended"].includes(driver.status) && data.status !== "cancelled") {
+      return { ok: false as const, reason: "blocked" as const };
+    }
+
+    const { error } = await context.supabase
+      .from("bookings")
+      .update({ status: data.status })
+      .eq("id", data.id)
+      .eq("driver_id", driver.id);
+    if (error) return { ok: false as const, reason: "invalid_transition" as const };
+    return { ok: true as const };
+  });
+
+/* ---------------------------------------------------------------------------
+ * Offer editing and availability
+ * ------------------------------------------------------------------------- */
+
+export const updateDriverOffer = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: {
+    id: string;
+    pickupCity: PickupCity;
+    destinationAirport: Airport;
+    date: string;
+    time: string;
+    rideType: RideType;
+    price: number;
+  }) => input)
+  .handler(async ({ data, context }) => {
+    if (!(Number(data.price) > 0)) return { ok: false as const, reason: "invalid_price" as const };
+
+    const { data: driver } = await context.supabase
+      .from("drivers")
+      .select("id, status")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (!driver) return { ok: false as const, reason: "not_driver" as const };
+    if (!["active", "approved"].includes(driver.status)) return { ok: false as const, reason: "blocked" as const };
+
+    const { error } = await context.supabase
+      .from("driver_offers")
+      .update({
+        pickup_city: data.pickupCity,
+        destination_airport: data.destinationAirport,
+        date: data.date,
+        time: data.time,
+        ride_type: data.rideType,
+        price: Number(data.price),
+      })
+      .eq("id", data.id)
+      .eq("driver_id", driver.id);
+    if (error) return { ok: false as const, reason: "duplicate" as const };
+    return { ok: true as const };
+  });
+
+export const setDriverOfferStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id: string; status: "active" | "paused" }) => input)
+  .handler(async ({ data, context }) => {
+    const { data: driver } = await context.supabase
+      .from("drivers")
+      .select("id, status")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (!driver) return { ok: false as const, reason: "not_driver" as const };
+    if (data.status === "active" && !["active", "approved"].includes(driver.status)) {
+      return { ok: false as const, reason: "blocked" as const };
+    }
+
+    const { error } = await context.supabase
+      .from("driver_offers")
+      .update({ status: data.status })
+      .eq("id", data.id)
+      .eq("driver_id", driver.id);
+    if (error) throw error;
+    return { ok: true as const };
+  });
+
+/* ---------------------------------------------------------------------------
+ * Commission and payment foundation
+ * ------------------------------------------------------------------------- */
+
+export type PaymentRow = {
+  id: string;
+  amount_sar: number;
+  amount_usd: number | null;
+  provider: string;
+  status: string;
+  created_at: string;
+};
+
+export type CommissionSummary = {
+  charged: number;
+  paid: number;
+  outstanding: number;
+  transactions: CommissionRow[];
+  payments: PaymentRow[];
+};
+
+export const getCommissionSummary = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<CommissionSummary> => {
+    const { data: driver } = await context.supabase
+      .from("drivers")
+      .select("id, commission_balance_sar")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (!driver) return { charged: 0, paid: 0, outstanding: 0, transactions: [], payments: [] };
+
+    const { data: rows } = await context.supabase
+      .from("commission_transactions")
+      .select("id, amount_sar, type, status, created_at")
+      .eq("driver_id", driver.id)
+      .order("created_at", { ascending: false });
+
+    const transactions = (rows ?? []) as CommissionRow[];
+    const sum = (type: string) =>
+      transactions
+        .filter((row) => row.type === type && row.status === "confirmed")
+        .reduce((total, row) => total + Number(row.amount_sar), 0);
+
+    const { data: payments } = await context.supabase
+      .from("payment_transactions")
+      .select("id, amount_sar, amount_usd, provider, status, created_at")
+      .eq("driver_id", driver.id)
+      .order("created_at", { ascending: false })
+      .limit(20);
+
+    return {
+      charged: sum("commission_charge"),
+      paid: sum("payment"),
+      outstanding: Number(driver.commission_balance_sar),
+      transactions,
+      payments: (payments ?? []) as PaymentRow[],
+    };
+  });
