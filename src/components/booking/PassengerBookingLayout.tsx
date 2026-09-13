@@ -1,9 +1,11 @@
 import type { ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
 import { BookingProgress } from "./BookingProgress";
 import { useBookingText } from "@/lib/i18n-booking";
+import { useMyBookingText } from "@/lib/i18n-mybookings";
 
 type Props = {
   step: number;
@@ -24,10 +26,14 @@ export function PassengerBookingLayout({
   step, total, title, subtitle, children, aside, error, onBack, onContinue, continueLabel, continueDisabled, hideNav,
 }: Props) {
   const b = useBookingText();
+  const m = useMyBookingText();
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <Header />
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 pb-32 pt-26 sm:px-6 sm:pt-32 lg:pb-16">
+        <div className="mb-4 flex justify-end">
+          <Link to="/bookings" className="min-h-11 text-sm font-bold text-primary hover:text-foreground">{m.myBookings}</Link>
+        </div>
         <BookingProgress step={step} total={total} />
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
           <section className="rounded-lg border border-border bg-card p-5 shadow-card sm:p-8">

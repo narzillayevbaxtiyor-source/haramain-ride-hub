@@ -52,10 +52,14 @@ export type Database = {
       bookings: {
         Row: {
           adults: number
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
           children: number
           contact_name: string | null
           contact_phone: string | null
           created_at: string
+          currency: string
           date: string
           destination_airport: Database["public"]["Enums"]["destination_airport"]
           driver_id: string | null
@@ -68,6 +72,7 @@ export type Database = {
           passengers: number
           pickup_city: Database["public"]["Enums"]["pickup_city"]
           pickup_location: string
+          previous_status: Database["public"]["Enums"]["booking_status"] | null
           price: number
           ride_type: Database["public"]["Enums"]["ride_type"]
           status: Database["public"]["Enums"]["booking_status"]
@@ -76,10 +81,14 @@ export type Database = {
         }
         Insert: {
           adults?: number
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
           children?: number
           contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
+          currency?: string
           date: string
           destination_airport: Database["public"]["Enums"]["destination_airport"]
           driver_id?: string | null
@@ -92,6 +101,7 @@ export type Database = {
           passengers: number
           pickup_city: Database["public"]["Enums"]["pickup_city"]
           pickup_location: string
+          previous_status?: Database["public"]["Enums"]["booking_status"] | null
           price: number
           ride_type: Database["public"]["Enums"]["ride_type"]
           status?: Database["public"]["Enums"]["booking_status"]
@@ -100,10 +110,14 @@ export type Database = {
         }
         Update: {
           adults?: number
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
           children?: number
           contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
+          currency?: string
           date?: string
           destination_airport?: Database["public"]["Enums"]["destination_airport"]
           driver_id?: string | null
@@ -116,6 +130,7 @@ export type Database = {
           passengers?: number
           pickup_city?: Database["public"]["Enums"]["pickup_city"]
           pickup_location?: string
+          previous_status?: Database["public"]["Enums"]["booking_status"] | null
           price?: number
           ride_type?: Database["public"]["Enums"]["ride_type"]
           status?: Database["public"]["Enums"]["booking_status"]

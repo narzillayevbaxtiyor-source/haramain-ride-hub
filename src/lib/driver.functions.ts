@@ -451,7 +451,7 @@ export const listDriverBookings = createServerFn({ method: "GET" })
 /** Only an active driver may accept. Rejection frees the passenger to pick another offer. */
 export const respondToBooking = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { id: string; accept: boolean }) => input)
+  .inputValidator((input: { id: string; accept: boolean; reason?: string }) => input)
   .handler(async ({ data, context }) => {
     const { data: driver } = await context.supabase
       .from("drivers")
@@ -474,9 +474,17 @@ export const respondToBooking = createServerFn({ method: "POST" })
 
     const { error } = await context.supabase
       .from("bookings")
-      .update({ status: data.accept ? "driver_accepted" : "rejected" })
+      .update({
+        status: data.accept ? "driver_accepted" : "rejected",
+        ...(data.accept ? {} : { cancellation_reason: (data.reason ?? "").trim() || null, cancelled_by: context.userId }),
+      })
       .eq("id", data.id);
-    if (error) return { ok: false as const, reason: "invalid_transition" as const };
+
+    if (error) {
+      // The database refuses a second accepted trip that overlaps an existing one.
+      if (error.message.includes("booking_conflict")) return { ok: false as const, reason: "conflict" as const };
+      return { ok: false as const, reason: "invalid_transition" as const };
+    }
     return { ok: true as const };
   });
 
@@ -491,7 +499,7 @@ const DRIVER_STATUS_STEPS: BookingStatus[] = [
 /** Sequential status updates. The database also rejects invalid jumps. */
 export const updateBookingStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { id: string; status: BookingStatus }) => input)
+  .inputValidator((input: { id: string; status: BookingStatus; reason?: string }) => input)
   .handler(async ({ data, context }) => {
     if (!DRIVER_STATUS_STEPS.includes(data.status)) return { ok: false as const, reason: "invalid_transition" as const };
 
@@ -507,7 +515,12 @@ export const updateBookingStatus = createServerFn({ method: "POST" })
 
     const { error } = await context.supabase
       .from("bookings")
-      .update({ status: data.status })
+      .update({
+        status: data.status,
+        ...(data.status === "cancelled"
+          ? { cancellation_reason: (data.reason ?? "").trim() || null, cancelled_by: context.userId }
+          : {}),
+      })
       .eq("id", data.id)
       .eq("driver_id", driver.id);
     if (error) return { ok: false as const, reason: "invalid_transition" as const };
