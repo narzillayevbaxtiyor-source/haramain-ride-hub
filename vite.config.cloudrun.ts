@@ -15,5 +15,11 @@ export default defineConfig({
   },
   nitro: {
     preset: "node-server",
+    // Pin the output paths so `npm start` (.output/server/index.mjs) always matches.
+    output: {
+      dir: ".output",
+      serverDir: ".output/server",
+      publicDir: ".output/public",
+    },
   },
 });
