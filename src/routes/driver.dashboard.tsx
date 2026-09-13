@@ -35,7 +35,7 @@ export const Route = createFileRoute("/driver/dashboard")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: DriverDashboard;
+  component: DriverDashboard,
 });
 
 const VEHICLE_TYPES = ["sedan", "suv", "minivan", "van"] as const;
