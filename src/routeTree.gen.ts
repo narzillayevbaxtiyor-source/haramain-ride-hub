@@ -17,6 +17,7 @@ import { Route as PassengerRouteImport } from './routes/passenger'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
 import { Route as AdminDriversRouteImport } from './routes/admin.drivers'
+import { Route as AdminOffersRouteImport } from './routes/admin.offers'
 import { Route as AdminPassengersRouteImport } from './routes/admin.passengers'
 import { Route as BookingsIndexRouteImport } from './routes/bookings.index'
 import { Route as BookingsIdRouteImport } from './routes/bookings.$id'
@@ -65,6 +66,11 @@ const AdminBookingsRoute = AdminBookingsRouteImport.update({
 const AdminDriversRoute = AdminDriversRouteImport.update({
   id: '/drivers',
   path: '/drivers',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOffersRoute = AdminOffersRouteImport.update({
+  id: '/offers',
+  path: '/offers',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminPassengersRoute = AdminPassengersRouteImport.update({
@@ -121,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/passenger': typeof PassengerRoute
   '/admin/bookings': typeof AdminBookingsRouteWithChildren
   '/admin/drivers': typeof AdminDriversRouteWithChildren
+  '/admin/offers': typeof AdminOffersRoute
   '/admin/passengers': typeof AdminPassengersRoute
   '/bookings/$id': typeof BookingsIdRoute
   '/driver/dashboard': typeof DriverDashboardRoute
@@ -137,6 +144,7 @@ export interface FileRoutesByTo {
   '/passenger': typeof PassengerRoute
   '/admin/bookings': typeof AdminBookingsRouteWithChildren
   '/admin/drivers': typeof AdminDriversRouteWithChildren
+  '/admin/offers': typeof AdminOffersRoute
   '/admin/passengers': typeof AdminPassengersRoute
   '/bookings/$id': typeof BookingsIdRoute
   '/driver/dashboard': typeof DriverDashboardRoute
@@ -157,6 +165,7 @@ export interface FileRoutesById {
   '/passenger': typeof PassengerRoute
   '/admin/bookings': typeof AdminBookingsRouteWithChildren
   '/admin/drivers': typeof AdminDriversRouteWithChildren
+  '/admin/offers': typeof AdminOffersRoute
   '/admin/passengers': typeof AdminPassengersRoute
   '/bookings/$id': typeof BookingsIdRoute
   '/driver/dashboard': typeof DriverDashboardRoute
@@ -178,6 +187,7 @@ export interface FileRouteTypes {
     | '/passenger'
     | '/admin/bookings'
     | '/admin/drivers'
+    | '/admin/offers'
     | '/admin/passengers'
     | '/bookings/$id'
     | '/driver/dashboard'
@@ -194,6 +204,7 @@ export interface FileRouteTypes {
     | '/passenger'
     | '/admin/bookings'
     | '/admin/drivers'
+    | '/admin/offers'
     | '/admin/passengers'
     | '/bookings/$id'
     | '/driver/dashboard'
@@ -213,6 +224,7 @@ export interface FileRouteTypes {
     | '/passenger'
     | '/admin/bookings'
     | '/admin/drivers'
+    | '/admin/offers'
     | '/admin/passengers'
     | '/bookings/$id'
     | '/driver/dashboard'
@@ -289,6 +301,13 @@ declare module '@tanstack/react-router' {
       path: '/drivers'
       fullPath: '/admin/drivers'
       preLoaderRoute: typeof AdminDriversRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/offers': {
+      id: '/admin/offers'
+      path: '/offers'
+      fullPath: '/admin/offers'
+      preLoaderRoute: typeof AdminOffersRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/passengers': {
@@ -384,6 +403,7 @@ const AdminDriversRouteWithChildren = AdminDriversRoute._addFileChildren(
 interface AdminRouteChildren {
   AdminBookingsRoute: typeof AdminBookingsRouteWithChildren
   AdminDriversRoute: typeof AdminDriversRouteWithChildren
+  AdminOffersRoute: typeof AdminOffersRoute
   AdminPassengersRoute: typeof AdminPassengersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -391,6 +411,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminBookingsRoute: AdminBookingsRouteWithChildren,
   AdminDriversRoute: AdminDriversRouteWithChildren,
+  AdminOffersRoute: AdminOffersRoute,
   AdminPassengersRoute: AdminPassengersRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
