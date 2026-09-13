@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DriverRouteImport } from './routes/driver'
 import { Route as PassengerRouteImport } from './routes/passenger'
+import { Route as DriverIndexRouteImport } from './routes/driver.index'
 import { Route as DriverDashboardRouteImport } from './routes/driver.dashboard'
 import { Route as DriverLoginRouteImport } from './routes/driver.login'
 import { Route as DriverRegisterRouteImport } from './routes/driver.register'
@@ -30,6 +31,11 @@ const PassengerRoute = PassengerRouteImport.update({
   id: '/passenger',
   path: '/passenger',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DriverIndexRoute = DriverIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DriverRoute,
 } as any)
 const DriverDashboardRoute = DriverDashboardRouteImport.update({
   id: '/dashboard',
@@ -54,14 +60,15 @@ export interface FileRoutesByFullPath {
   '/driver/dashboard': typeof DriverDashboardRoute
   '/driver/login': typeof DriverLoginRoute
   '/driver/register': typeof DriverRegisterRoute
+  '/driver/': typeof DriverIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/driver': typeof DriverRouteWithChildren
   '/passenger': typeof PassengerRoute
   '/driver/dashboard': typeof DriverDashboardRoute
   '/driver/login': typeof DriverLoginRoute
   '/driver/register': typeof DriverRegisterRoute
+  '/driver': typeof DriverIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +78,7 @@ export interface FileRoutesById {
   '/driver/dashboard': typeof DriverDashboardRoute
   '/driver/login': typeof DriverLoginRoute
   '/driver/register': typeof DriverRegisterRoute
+  '/driver/': typeof DriverIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,14 +89,15 @@ export interface FileRouteTypes {
     | '/driver/dashboard'
     | '/driver/login'
     | '/driver/register'
+    | '/driver/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/driver'
     | '/passenger'
     | '/driver/dashboard'
     | '/driver/login'
     | '/driver/register'
+    | '/driver'
   id:
     | '__root__'
     | '/'
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/driver/dashboard'
     | '/driver/login'
     | '/driver/register'
+    | '/driver/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -128,6 +138,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PassengerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/driver/': {
+      id: '/driver/'
+      path: '/'
+      fullPath: '/driver/'
+      preLoaderRoute: typeof DriverIndexRouteImport
+      parentRoute: typeof DriverRoute
+    }
     '/driver/dashboard': {
       id: '/driver/dashboard'
       path: '/dashboard'
@@ -156,12 +173,14 @@ interface DriverRouteChildren {
   DriverDashboardRoute: typeof DriverDashboardRoute
   DriverLoginRoute: typeof DriverLoginRoute
   DriverRegisterRoute: typeof DriverRegisterRoute
+  DriverIndexRoute: typeof DriverIndexRoute
 }
 
 const DriverRouteChildren: DriverRouteChildren = {
   DriverDashboardRoute: DriverDashboardRoute,
   DriverLoginRoute: DriverLoginRoute,
   DriverRegisterRoute: DriverRegisterRoute,
+  DriverIndexRoute: DriverIndexRoute,
 }
 
 const DriverRouteWithChildren =
