@@ -147,11 +147,31 @@ export const createPassengerBooking = createServerFn({ method: "POST" })
       return { ok: false as const, reason: "capacity" as CreateReason };
     }
 
-    const { data: profile } = await context.supabase
+    // A booking is linked to the passenger's profile row, which does not exist yet the
+    // first time somebody signs in through Google. Create it before booking.
+    let { data: profile } = await context.supabase
       .from("profiles")
       .select("name, phone")
       .eq("id", context.userId)
       .maybeSingle();
+
+    if (!profile) {
+      const claims = context.claims as { email?: string; user_metadata?: { full_name?: string; name?: string; avatar_url?: string } };
+      await context.supabase.from("profiles").insert({
+        id: context.userId,
+        role: "passenger",
+        email: claims?.email ?? null,
+        name: claims?.user_metadata?.full_name ?? claims?.user_metadata?.name ?? null,
+        avatar_url: claims?.user_metadata?.avatar_url ?? null,
+      });
+      const { data: created } = await context.supabase
+        .from("profiles")
+        .select("name, phone")
+        .eq("id", context.userId)
+        .maybeSingle();
+      profile = created;
+    }
+
 
     const { data: created, error } = await context.supabase
       .from("bookings")
