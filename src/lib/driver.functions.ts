@@ -339,6 +339,9 @@ export const createDriverOffer = createServerFn({ method: "POST" })
       return { ok: false as const, reason: "invalid" as const };
     }
     if (!(Number(data.price) > 0)) return { ok: false as const, reason: "invalid_price" as const };
+    if (new Date(`${data.date}T${data.time}`).getTime() < Date.now()) {
+      return { ok: false as const, reason: "past_date" as const };
+    }
 
     const { data: driver } = await context.supabase
       .from("drivers")
@@ -544,6 +547,9 @@ export const updateDriverOffer = createServerFn({ method: "POST" })
   }) => input)
   .handler(async ({ data, context }) => {
     if (!(Number(data.price) > 0)) return { ok: false as const, reason: "invalid_price" as const };
+    if (new Date(`${data.date}T${data.time}`).getTime() < Date.now()) {
+      return { ok: false as const, reason: "past_date" as const };
+    }
 
     const { data: driver } = await context.supabase
       .from("drivers")
