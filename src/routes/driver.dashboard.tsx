@@ -153,6 +153,7 @@ function DriverDashboard() {
     blocked: t.blockedAction,
     invalid: d.error,
     invalid_price: d.priceHint,
+    past_date: d.pastDate,
     invalid_transition: t.invalidTransition,
     duplicate: t.duplicateOffer,
     conflict: mb.errConflict,
@@ -433,7 +434,7 @@ function DriverDashboard() {
                 <div className="grid gap-4 sm:grid-cols-2">
                   <label className="block">
                     <span className="text-sm font-semibold text-card-foreground">{d.date}</span>
-                    <input type="date" value={date} onChange={(event) => setDate(event.target.value)} className="mt-2 min-h-13 w-full rounded-md border border-input bg-card px-4 text-base text-card-foreground" />
+                    <input type="date" min={new Date().toISOString().slice(0, 10)} value={date} onChange={(event) => setDate(event.target.value)} className="mt-2 min-h-13 w-full rounded-md border border-input bg-card px-4 text-base text-card-foreground" />
                   </label>
                   <label className="block">
                     <span className="text-sm font-semibold text-card-foreground">{d.time}</span>
