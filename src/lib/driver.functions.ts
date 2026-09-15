@@ -17,6 +17,7 @@ export type DriverAccount = {
     status: DriverStatus;
     vehicle_type: string;
     vehicle_model: string | null;
+    vehicle_class: "economy" | "standard" | "comfort";
     plate_number: string | null;
     seats: number;
     luggage_capacity: number;
@@ -135,7 +136,7 @@ export const getDriverAccount = createServerFn({ method: "GET" })
     const { data: driver } = await context.supabase
       .from("drivers")
       .select(
-        "id, status, vehicle_type, vehicle_model, plate_number, seats, luggage_capacity, exterior_photo, interior_photo, commission_rate, commission_balance_sar",
+        "id, status, vehicle_type, vehicle_model, vehicle_class, plate_number, seats, luggage_capacity, exterior_photo, interior_photo, commission_rate, commission_balance_sar",
       )
       .eq("user_id", context.userId)
       .maybeSingle();
@@ -149,6 +150,7 @@ export const getDriverAccount = createServerFn({ method: "GET" })
 type RegistrationInput = {
   fullName: string;
   vehicleType: string;
+  vehicleClass?: "economy" | "standard" | "comfort";
   vehicleModel: string;
   plateNumber: string;
   seats: number;
@@ -221,6 +223,7 @@ export const completeDriverRegistration = createServerFn({ method: "POST" })
         user_id: context.userId,
         status: "active",
         vehicle_type: data.vehicleType,
+        vehicle_class: data.vehicleClass ?? "standard",
         vehicle_model: data.vehicleModel.trim(),
         plate_number: plate,
         seats: data.seats,
@@ -248,6 +251,7 @@ export const updateDriverProfile = createServerFn({ method: "POST" })
   .inputValidator((input: {
     fullName: string;
     vehicleType: string;
+    vehicleClass?: "economy" | "standard" | "comfort";
     vehicleModel: string;
     plateNumber: string;
     seats: number;
@@ -279,6 +283,7 @@ export const updateDriverProfile = createServerFn({ method: "POST" })
       .from("drivers")
       .update({
         vehicle_type: data.vehicleType,
+        vehicle_class: data.vehicleClass ?? "standard",
         vehicle_model: data.vehicleModel.trim(),
         plate_number: plate,
         seats: data.seats,

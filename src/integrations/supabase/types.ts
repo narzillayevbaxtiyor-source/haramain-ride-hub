@@ -359,6 +359,7 @@ export type Database = {
           status: Database["public"]["Enums"]["driver_status"]
           updated_at: string
           user_id: string
+          vehicle_class: Database["public"]["Enums"]["vehicle_class"]
           vehicle_model: string | null
           vehicle_type: string
         }
@@ -379,6 +380,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["driver_status"]
           updated_at?: string
           user_id: string
+          vehicle_class?: Database["public"]["Enums"]["vehicle_class"]
           vehicle_model?: string | null
           vehicle_type: string
         }
@@ -399,6 +401,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["driver_status"]
           updated_at?: string
           user_id?: string
+          vehicle_class?: Database["public"]["Enums"]["vehicle_class"]
           vehicle_model?: string | null
           vehicle_type?: string
         }
@@ -591,6 +594,7 @@ export type Database = {
           ride_type: Database["public"]["Enums"]["ride_type"] | null
           seats: number | null
           time: string | null
+          vehicle_class: Database["public"]["Enums"]["vehicle_class"] | null
           vehicle_model: string | null
           vehicle_type: string | null
         }
@@ -639,6 +643,7 @@ export type Database = {
         | "cancelled"
       pickup_city: "makkah" | "madinah"
       ride_type: "private" | "shared"
+      vehicle_class: "economy" | "standard" | "comfort"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -792,6 +797,7 @@ export const Constants = {
       ],
       pickup_city: ["makkah", "madinah"],
       ride_type: ["private", "shared"],
+      vehicle_class: ["economy", "standard", "comfort"],
     },
   },
 } as const

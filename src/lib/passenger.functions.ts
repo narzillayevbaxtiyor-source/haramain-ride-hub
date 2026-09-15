@@ -97,6 +97,7 @@ type CreateInput = {
   children: number;
   largeLuggage: number;
   handLuggage: number;
+  contactPhone: string;
 };
 
 type CreateReason =
@@ -105,6 +106,7 @@ type CreateReason =
   | "duplicate_booking"
   | "booking_conflict"
   | "capacity"
+  | "need_phone"
   | "invalid"
   | "failed";
 
@@ -129,6 +131,12 @@ export const createPassengerBooking = createServerFn({ method: "POST" })
     const luggage = Number(data.largeLuggage) + Number(data.handLuggage);
     if (!data.offerId || !data.date || !data.time || passengers < 1 || !data.pickupLocation.trim()) {
       return { ok: false as const, reason: "invalid" as CreateReason };
+    }
+
+    // The driver has to be able to reach the passenger, so a usable phone number is required.
+    const contactPhone = `+${(data.contactPhone ?? "").replace(/[^\d]/g, "")}`;
+    if (!/^\+\d{8,15}$/.test(contactPhone)) {
+      return { ok: false as const, reason: "need_phone" as CreateReason };
     }
 
     // public_driver_offers only exposes offers that are active and belong to a driver
@@ -186,6 +194,10 @@ export const createPassengerBooking = createServerFn({ method: "POST" })
     }
 
 
+    if (!profile?.phone) {
+      await context.supabase.from("profiles").update({ phone: contactPhone }).eq("id", context.userId);
+    }
+
     const { data: created, error } = await context.supabase
       .from("bookings")
       .insert({
@@ -208,7 +220,7 @@ export const createPassengerBooking = createServerFn({ method: "POST" })
         currency: "SAR",
         status: "pending",
         contact_name: profile?.name ?? null,
-        contact_phone: profile?.phone ?? null,
+        contact_phone: contactPhone,
       })
       .select("id, passenger_id, driver_id, offer_id, status")
       .single();
