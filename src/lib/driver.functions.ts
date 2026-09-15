@@ -150,6 +150,7 @@ export const getDriverAccount = createServerFn({ method: "GET" })
 type RegistrationInput = {
   fullName: string;
   vehicleType: string;
+  vehicleClass?: "economy" | "standard" | "comfort";
   vehicleModel: string;
   plateNumber: string;
   seats: number;
