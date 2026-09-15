@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 export type PickupCity = "makkah" | "madinah";
 export type Airport = "jeddah" | "madinah" | "taif";
 export type RideType = "private" | "shared";
+export type VehicleClass = "economy" | "standard" | "comfort";
 
 export type BookingDraft = {
   city: PickupCity | null;
@@ -42,6 +43,7 @@ export type DriverOffer = {
   price: number;
   vehicle_type: string;
   vehicle_model: string | null;
+  vehicle_class: VehicleClass;
   seats: number;
   luggage_capacity: number;
   rating: number | null;
