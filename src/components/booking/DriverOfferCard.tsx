@@ -43,7 +43,12 @@ export function DriverOfferCard({ offer, onSelect, highlighted }: { offer: Drive
         <p dir="ltr" className="text-foreground">{offer.date} · {offer.time.slice(0, 5)}</p>
       </div>
 
-      <span className="mt-3 inline-flex w-fit rounded-full bg-secondary px-3 py-1 text-xs font-bold text-secondary-foreground">{labels.ride(offer.ride_type)}</span>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <span className="inline-flex w-fit rounded-full bg-secondary px-3 py-1 text-xs font-bold text-secondary-foreground">{labels.ride(offer.ride_type)}</span>
+        <span className="inline-flex w-fit rounded-full bg-primary-soft px-3 py-1 text-xs font-bold text-primary">
+          {offer.vehicle_class === "economy" ? b.classEconomy : offer.vehicle_class === "comfort" ? b.classComfort : b.classStandard}
+        </span>
+      </div>
 
       <button
         type="button"
