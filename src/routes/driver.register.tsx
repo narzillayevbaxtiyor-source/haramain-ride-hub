@@ -55,6 +55,7 @@ function DriverRegister() {
 
   const [fullName, setFullName] = useState("");
   const [vehicleType, setVehicleType] = useState<string>("");
+  const [vehicleClass, setVehicleClass] = useState<"economy" | "standard" | "comfort">("standard");
   const [vehicleModel, setVehicleModel] = useState("");
   const [plateNumber, setPlateNumber] = useState("");
   const [seats, setSeats] = useState(4);
@@ -128,6 +129,7 @@ function DriverRegister() {
       data: {
         fullName,
         vehicleType,
+        vehicleClass,
         vehicleModel,
         plateNumber,
         seats,
@@ -264,6 +266,14 @@ function DriverRegister() {
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               {VEHICLE_TYPES.map((type) => (
                 <OptionButton key={type} selected={vehicleType === type} label={d[type]} onClick={() => setVehicleType(type)} />
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-card-foreground">{d.vehicleClass}</p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-3">
+              {(["economy", "standard", "comfort"] as const).map((value) => (
+                <OptionButton key={value} selected={vehicleClass === value} label={d[value]} onClick={() => setVehicleClass(value)} />
               ))}
             </div>
           </div>
