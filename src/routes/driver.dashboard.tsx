@@ -88,6 +88,7 @@ function DriverDashboard() {
 
   const [fullName, setFullName] = useState("");
   const [vehicleType, setVehicleType] = useState("");
+  const [vehicleClass, setVehicleClass] = useState<"economy" | "standard" | "comfort">("standard");
   const [vehicleModel, setVehicleModel] = useState("");
   const [plateNumber, setPlateNumber] = useState("");
   const [seats, setSeats] = useState(4);
@@ -109,6 +110,7 @@ function DriverDashboard() {
     if (next.driver) {
       setFullName(next.profile.name ?? "");
       setVehicleType(next.driver.vehicle_type);
+      setVehicleClass(next.driver.vehicle_class);
       setVehicleModel(next.driver.vehicle_model ?? "");
       setPlateNumber(next.driver.plate_number ?? "");
       setSeats(next.driver.seats);
@@ -215,7 +217,7 @@ function DriverDashboard() {
   async function handleSave() {
     setSaved(false);
     const ok = await run(() =>
-      saveProfile({ data: { fullName, vehicleType, vehicleModel, plateNumber, seats, luggageCapacity, exteriorPhoto, interiorPhoto } }),
+      saveProfile({ data: { fullName, vehicleType, vehicleClass, vehicleModel, plateNumber, seats, luggageCapacity, exteriorPhoto, interiorPhoto } }),
     );
     if (ok) {
       setEditing(false);
@@ -549,6 +551,12 @@ function DriverDashboard() {
                       <OptionButton key={type} selected={vehicleType === type} label={d[type]} onClick={() => setVehicleType(type)} />
                     ))}
                   </div>
+                  <p className="mt-5 text-sm font-semibold text-card-foreground">{d.vehicleClass}</p>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                    {(["economy", "standard", "comfort"] as const).map((value) => (
+                      <OptionButton key={value} selected={vehicleClass === value} label={d[value]} onClick={() => setVehicleClass(value)} />
+                    ))}
+                  </div>
                 </div>
                 <TextField label={d.vehicleModel} value={vehicleModel} onChange={setVehicleModel} />
                 <TextField label={d.plate} value={plateNumber} onChange={setPlateNumber} />
@@ -577,6 +585,7 @@ function DriverDashboard() {
                     [d.phoneLabel, account.profile.phone ?? "—"],
                     [t.email, account.profile.email ?? "—"],
                     [d.vehicleType, d[driver.vehicle_type as (typeof VEHICLE_TYPES)[number]] ?? driver.vehicle_type],
+                    [d.vehicleClass, d[driver.vehicle_class]],
                     [d.vehicleModel, driver.vehicle_model ?? "—"],
                     [d.plate, driver.plate_number ?? "—"],
                     [d.seats, String(driver.seats)],

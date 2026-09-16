@@ -18,7 +18,7 @@ import { BookingSummary } from "@/components/booking/BookingSummary";
 import { SignInGate } from "@/components/booking/SignInGate";
 import { useDriverSession } from "@/hooks/useDriverSession";
 import { createPassengerBooking } from "@/lib/passenger.functions";
-import { emptyDraft, fetchMatchingOffers, type BookingDraft, type DriverOffer, type RideType } from "@/lib/booking";
+import { emptyDraft, fetchMatchingOffers, type BookingDraft, type DriverOffer, type RideType, type VehicleClass } from "@/lib/booking";
 import { useBookingText } from "@/lib/i18n-booking";
 import { useMyBookingText } from "@/lib/i18n-mybookings";
 
@@ -52,6 +52,8 @@ function PassengerFlow() {
   const [sort, setSort] = useState<OfferSort>("cheapest");
   const [rideFilter, setRideFilter] = useState<RideType | "all">("all");
   const [vehicleFilter, setVehicleFilter] = useState("all");
+  const [classFilter, setClassFilter] = useState<VehicleClass | "all">("all");
+  const [contactPhone, setContactPhone] = useState("");
 
   const patch = (values: Partial<BookingDraft>) => {
     setError(null);
@@ -70,6 +72,7 @@ function PassengerFlow() {
     duplicate_booking: m.errDuplicate,
     booking_conflict: m.errConflict,
     capacity: m.errCapacity,
+    need_phone: b.needPhone,
     invalid: b.bookingError,
     failed: b.bookingError,
   };
@@ -87,6 +90,7 @@ function PassengerFlow() {
           children: draft.children,
           largeLuggage: draft.largeLuggage,
           handLuggage: draft.handLuggage,
+          contactPhone,
         },
       });
     },
@@ -112,10 +116,13 @@ function PassengerFlow() {
   const vehicleTypes = useMemo(() => Array.from(new Set(offers.map((offer) => offer.vehicle_type))), [offers]);
   const visibleOffers = useMemo(() => {
     const filtered = offers.filter(
-      (offer) => (rideFilter === "all" || offer.ride_type === rideFilter) && (vehicleFilter === "all" || offer.vehicle_type === vehicleFilter),
+      (offer) =>
+        (rideFilter === "all" || offer.ride_type === rideFilter) &&
+        (vehicleFilter === "all" || offer.vehicle_type === vehicleFilter) &&
+        (classFilter === "all" || offer.vehicle_class === classFilter),
     );
     return filtered.sort((a, c) => (sort === "cheapest" ? a.price - c.price : (Number(c.rating ?? 0) - Number(a.rating ?? 0))));
-  }, [offers, rideFilter, vehicleFilter, sort]);
+  }, [offers, rideFilter, vehicleFilter, classFilter, sort]);
 
   const validate = (current: number): string | null => {
     if (current === 1) {
@@ -197,13 +204,41 @@ function PassengerFlow() {
         title={b.confirmTitle}
         error={error}
         onBack={() => { setSelected(null); setStep(6); }}
-        onContinue={signedIn ? () => bookingMutation.mutate() : undefined}
+        onContinue={
+          signedIn
+            ? () => {
+                if (!/^\+?\d{8,15}$/.test(contactPhone.replace(/[^\d+]/g, ""))) {
+                  setError(b.needPhone);
+                  return;
+                }
+                setError(null);
+                bookingMutation.mutate();
+              }
+            : undefined
+        }
         continueLabel={bookingMutation.isPending ? b.saving : b.confirmBooking}
         continueDisabled={bookingMutation.isPending}
         aside={summary}
       >
         <div className="space-y-6">
           <BookingSummary draft={draft} offer={selected} />
+          {signedIn ? (
+            <div className="rounded-lg border border-border bg-card p-4 shadow-card sm:p-5">
+              <h2 className="font-display text-base font-bold text-card-foreground">{b.contactTitle}</h2>
+              <label className="mt-3 block">
+                <span className="mb-1.5 block text-xs font-bold uppercase text-muted-foreground">{b.phoneLabel}</span>
+                <input
+                  type="tel"
+                  inputMode="tel"
+                  dir="ltr"
+                  value={contactPhone}
+                  onChange={(event) => { setError(null); setContactPhone(event.target.value); }}
+                  placeholder={b.phonePlaceholder}
+                  className="min-h-12 w-full rounded-md border border-input bg-background px-3 text-sm font-semibold text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+              </label>
+            </div>
+          ) : null}
           {ready && !user ? <SignInGate redirectTo="/passenger" /> : null}
         </div>
       </PassengerBookingLayout>
@@ -290,6 +325,8 @@ function PassengerFlow() {
                   vehicle={vehicleFilter}
                   onVehicleChange={setVehicleFilter}
                   vehicleTypes={vehicleTypes}
+                  vehicleClass={classFilter}
+                  onVehicleClassChange={setClassFilter}
                 />
                 <div className="grid gap-4 sm:grid-cols-2">
                   {visibleOffers.map((offer) => (
