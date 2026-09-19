@@ -13,7 +13,7 @@ export function SignInGate({ redirectTo, onBeforeSignIn }: { redirectTo: string;
     setFailed(false);
     onBeforeSignIn?.();
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+      redirect_uri: `${window.location.origin}${redirectTo}`,
     });
     if (result.error) {
       setBusy(false);
