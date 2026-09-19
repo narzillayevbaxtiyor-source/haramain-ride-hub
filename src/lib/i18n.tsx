@@ -39,10 +39,7 @@ const translations = {
     footerText: "Comfortable airport transfers from Makkah and Madinah.",
     faq: "FAQ",
     contact: "Contact",
-    comingSoon: "Coming soon",
     backHome: "Back to home",
-    placeholderPassenger: "The passenger booking flow will be available in the next step.",
-    placeholderDriver: "Driver registration will be available in the next step.",
   },
   uz: {
 
@@ -81,10 +78,7 @@ const translations = {
     footerText: "Makka va Madinadan aeroportga qulay transferlar.",
     faq: "Savollar",
     contact: "Aloqa",
-    comingSoon: "Tez orada",
     backHome: "Bosh sahifaga qaytish",
-    placeholderPassenger: "Yo‘lovchilar uchun buyurtma jarayoni keyingi bosqichda tayyorlanadi.",
-    placeholderDriver: "Haydovchilar uchun ro‘yxatdan o‘tish keyingi bosqichda tayyorlanadi.",
   },
   ru: {
     language: "Русский",
@@ -122,10 +116,7 @@ const translations = {
     footerText: "Удобные трансферы из Мекки и Медины в аэропорты.",
     faq: "Вопросы",
     contact: "Контакты",
-    comingSoon: "Скоро",
     backHome: "Вернуться на главную",
-    placeholderPassenger: "Процесс заказа для пассажиров появится на следующем этапе.",
-    placeholderDriver: "Регистрация водителей появится на следующем этапе.",
   },
   ar: {
     language: "العربية",
@@ -163,10 +154,7 @@ const translations = {
     footerText: "تنقّل مريح إلى المطارات من مكة والمدينة.",
     faq: "الأسئلة الشائعة",
     contact: "تواصل معنا",
-    comingSoon: "قريبًا",
     backHome: "العودة إلى الرئيسية",
-    placeholderPassenger: "ستتوفر خطوات الحجز للمسافرين في المرحلة القادمة.",
-    placeholderDriver: "سيتوفر تسجيل السائقين في المرحلة القادمة.",
   },
 } as const;
 
