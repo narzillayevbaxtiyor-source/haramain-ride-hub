@@ -204,14 +204,20 @@ function DriverDashboard() {
   async function run(action: () => Promise<{ ok: boolean; reason?: string }>) {
     setBusy(true);
     setError(null);
-    const result = await action();
-    setBusy(false);
-    if (!result.ok) {
-      setError(reasonMessage[result.reason ?? ""] ?? t.updateFailed);
+    try {
+      const result = await action();
+      if (!result.ok) {
+        setError(reasonMessage[result.reason ?? ""] ?? t.updateFailed);
+        return false;
+      }
+      await refresh();
+      return true;
+    } catch {
+      setError(t.updateFailed);
       return false;
+    } finally {
+      setBusy(false);
     }
-    await refresh();
-    return true;
   }
 
   async function handleSave() {
@@ -514,7 +520,7 @@ function DriverDashboard() {
                         type="button"
                         aria-label={d.deleteOffer}
                         disabled={busy}
-                        onClick={() => void run(async () => { await removeOffer({ data: { id: offer.id } }); return { ok: true }; })}
+                        onClick={() => void run(() => removeOffer({ data: { id: offer.id } }))}
                         className="grid size-11 place-items-center rounded-md border border-input text-destructive"
                       >
                         <Trash2 className="size-4" aria-hidden="true" />

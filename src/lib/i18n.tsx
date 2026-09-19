@@ -39,10 +39,7 @@ const translations = {
     footerText: "Comfortable airport transfers from Makkah and Madinah.",
     faq: "FAQ",
     contact: "Contact",
-    comingSoon: "Coming soon",
     backHome: "Back to home",
-    placeholderPassenger: "The passenger booking flow will be available in the next step.",
-    placeholderDriver: "Driver registration will be available in the next step.",
   },
   uz: {
 
@@ -81,10 +78,7 @@ const translations = {
     footerText: "Makka va Madinadan aeroportga qulay transferlar.",
     faq: "Savollar",
     contact: "Aloqa",
-    comingSoon: "Tez orada",
     backHome: "Bosh sahifaga qaytish",
-    placeholderPassenger: "Yo‘lovchilar uchun buyurtma jarayoni keyingi bosqichda tayyorlanadi.",
-    placeholderDriver: "Haydovchilar uchun ro‘yxatdan o‘tish keyingi bosqichda tayyorlanadi.",
   },
   ru: {
     language: "Русский",
@@ -122,10 +116,7 @@ const translations = {
     footerText: "Удобные трансферы из Мекки и Медины в аэропорты.",
     faq: "Вопросы",
     contact: "Контакты",
-    comingSoon: "Скоро",
     backHome: "Вернуться на главную",
-    placeholderPassenger: "Процесс заказа для пассажиров появится на следующем этапе.",
-    placeholderDriver: "Регистрация водителей появится на следующем этапе.",
   },
   ar: {
     language: "العربية",
@@ -163,10 +154,7 @@ const translations = {
     footerText: "تنقّل مريح إلى المطارات من مكة والمدينة.",
     faq: "الأسئلة الشائعة",
     contact: "تواصل معنا",
-    comingSoon: "قريبًا",
     backHome: "العودة إلى الرئيسية",
-    placeholderPassenger: "ستتوفر خطوات الحجز للمسافرين في المرحلة القادمة.",
-    placeholderDriver: "سيتوفر تسجيل السائقين في المرحلة القادمة.",
   },
 } as const;
 
@@ -175,21 +163,29 @@ export type Translation = (typeof translations)["en"];
 type LanguageContextValue = { language: Language; setLanguage: (value: Language) => void; t: Translation };
 const LanguageContext = createContext<LanguageContextValue | undefined>(undefined);
 
-const STORAGE_KEY = "h2a-language";
+const LANGUAGE_COOKIE = "h2a-language";
 const supported: Language[] = ["en", "uz", "ru", "ar"];
+
+function readLanguageCookie(): Language | null {
+  const value = document.cookie
+    .split("; ")
+    .find((item) => item.startsWith(`${LANGUAGE_COOKIE}=`))
+    ?.split("=")[1];
+  return value && supported.includes(value as Language) ? (value as Language) : null;
+}
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>("en");
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(STORAGE_KEY) as Language | null;
-    if (stored && supported.includes(stored)) setLanguage(stored);
+    const stored = readLanguageCookie();
+    if (stored) setLanguage(stored);
   }, []);
 
   useEffect(() => {
     document.documentElement.lang = language;
     document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
-    window.localStorage.setItem(STORAGE_KEY, language);
+    document.cookie = `${LANGUAGE_COOKIE}=${language}; Path=/; Max-Age=31536000; SameSite=Lax`;
   }, [language]);
   const value = useMemo(() => ({ language, setLanguage, t: translations[language] as Translation }), [language]);
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;

@@ -3,7 +3,7 @@ import { useMyBookingText } from "@/lib/i18n-mybookings";
 import { lovable } from "@/integrations/lovable/index";
 
 /** Sign-in prompt for passengers. Bookings are always tied to a real account. */
-export function SignInGate({ redirectTo }: { redirectTo: string }) {
+export function SignInGate({ redirectTo, onBeforeSignIn }: { redirectTo: string; onBeforeSignIn?: () => void }) {
   const m = useMyBookingText();
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -11,6 +11,7 @@ export function SignInGate({ redirectTo }: { redirectTo: string }) {
   async function signIn() {
     setBusy(true);
     setFailed(false);
+    onBeforeSignIn?.();
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: `${window.location.origin}${redirectTo}`,
     });
