@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -38,6 +38,13 @@ export const Route = createFileRoute("/passenger")({
 });
 
 const TOTAL_STEPS = 6;
+const PASSENGER_DRAFT_KEY = "h2a-passenger-draft";
+
+type SavedPassengerFlow = {
+  draft: BookingDraft;
+  step: number;
+  selectedId: string | null;
+};
 
 function PassengerFlow() {
   const b = useBookingText();
@@ -54,6 +61,27 @@ function PassengerFlow() {
   const [vehicleFilter, setVehicleFilter] = useState("all");
   const [classFilter, setClassFilter] = useState<VehicleClass | "all">("all");
   const [contactPhone, setContactPhone] = useState("");
+
+  useEffect(() => {
+    const raw = window.sessionStorage.getItem(PASSENGER_DRAFT_KEY);
+    if (!raw) return;
+    window.sessionStorage.removeItem(PASSENGER_DRAFT_KEY);
+    try {
+      const saved = JSON.parse(raw) as SavedPassengerFlow;
+      if (!saved.draft || saved.step !== 7 || !saved.selectedId) return;
+      setDraft(saved.draft);
+      setStep(6);
+      void fetchMatchingOffers(saved.draft).then((matches) => {
+        const savedOffer = matches.find((offer) => offer.id === saved.selectedId);
+        if (savedOffer) {
+          setSelected(savedOffer);
+          setStep(7);
+        }
+      });
+    } catch {
+      // Invalid or stale browser state is ignored; the user can start a fresh booking.
+    }
+  }, []);
 
   const patch = (values: Partial<BookingDraft>) => {
     setError(null);
@@ -96,6 +124,7 @@ function PassengerFlow() {
     },
     onSuccess: (result) => {
       if (result.ok) {
+        window.sessionStorage.removeItem(PASSENGER_DRAFT_KEY);
         setError(null);
         setBookingId(result.bookingId);
         return;
@@ -239,7 +268,17 @@ function PassengerFlow() {
               </label>
             </div>
           ) : null}
-          {ready && !user ? <SignInGate redirectTo="/passenger" /> : null}
+          {ready && !user ? (
+            <SignInGate
+              redirectTo="/passenger"
+              onBeforeSignIn={() => {
+                window.sessionStorage.setItem(
+                  PASSENGER_DRAFT_KEY,
+                  JSON.stringify({ draft, step: 7, selectedId: selected.id } satisfies SavedPassengerFlow),
+                );
+              }}
+            />
+          ) : null}
         </div>
       </PassengerBookingLayout>
     );

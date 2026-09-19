@@ -576,7 +576,12 @@ export const updateDriverOffer = createServerFn({ method: "POST" })
       })
       .eq("id", data.id)
       .eq("driver_id", driver.id);
-    if (error) return { ok: false as const, reason: "duplicate" as const };
+    if (error) {
+      if (error.code === "23505" || error.message.includes("duplicate")) {
+        return { ok: false as const, reason: "duplicate" as const };
+      }
+      return { ok: false as const, reason: "failed" as const };
+    }
     return { ok: true as const };
   });
 
