@@ -234,6 +234,72 @@ export type Database = {
           },
         ]
       }
+      commission_chat_messages: {
+        Row: {
+          amount_sar: number | null
+          amount_usd: number | null
+          body: string | null
+          commission_transaction_id: string | null
+          created_at: string
+          crypto_asset: string | null
+          crypto_network: string | null
+          driver_id: string
+          id: string
+          message_type: Database["public"]["Enums"]["chat_message_type"]
+          payment_status: Database["public"]["Enums"]["chat_payment_status"]
+          sender_id: string
+          sender_role: Database["public"]["Enums"]["chat_sender_role"]
+          wallet_address: string | null
+        }
+        Insert: {
+          amount_sar?: number | null
+          amount_usd?: number | null
+          body?: string | null
+          commission_transaction_id?: string | null
+          created_at?: string
+          crypto_asset?: string | null
+          crypto_network?: string | null
+          driver_id: string
+          id?: string
+          message_type?: Database["public"]["Enums"]["chat_message_type"]
+          payment_status?: Database["public"]["Enums"]["chat_payment_status"]
+          sender_id: string
+          sender_role: Database["public"]["Enums"]["chat_sender_role"]
+          wallet_address?: string | null
+        }
+        Update: {
+          amount_sar?: number | null
+          amount_usd?: number | null
+          body?: string | null
+          commission_transaction_id?: string | null
+          created_at?: string
+          crypto_asset?: string | null
+          crypto_network?: string | null
+          driver_id?: string
+          id?: string
+          message_type?: Database["public"]["Enums"]["chat_message_type"]
+          payment_status?: Database["public"]["Enums"]["chat_payment_status"]
+          sender_id?: string
+          sender_role?: Database["public"]["Enums"]["chat_sender_role"]
+          wallet_address?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commission_chat_messages_commission_transaction_id_fkey"
+            columns: ["commission_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "commission_transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commission_chat_messages_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       commission_transactions: {
         Row: {
           amount_sar: number
@@ -630,6 +696,9 @@ export type Database = {
         | "completed"
         | "cancelled"
         | "rejected"
+      chat_message_type: "text" | "payment_widget"
+      chat_payment_status: "none" | "awaiting_payment" | "marked_paid" | "confirmed"
+      chat_sender_role: "driver" | "admin"
       commission_txn_status: "pending" | "confirmed" | "failed"
       commission_txn_type: "commission_charge" | "payment"
       destination_airport: "jeddah" | "madinah"
@@ -783,6 +852,9 @@ export const Constants = {
         "cancelled",
         "rejected",
       ],
+      chat_message_type: ["text", "payment_widget"],
+      chat_payment_status: ["none", "awaiting_payment", "marked_paid", "confirmed"],
+      chat_sender_role: ["driver", "admin"],
       commission_txn_status: ["pending", "confirmed", "failed"],
       commission_txn_type: ["commission_charge", "payment"],
       destination_airport: ["jeddah", "madinah"],
