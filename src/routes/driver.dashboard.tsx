@@ -50,7 +50,7 @@ export const Route = createFileRoute("/driver/dashboard")({
 
 const VEHICLE_TYPES = ["sedan", "suv", "minivan", "van"] as const;
 const CITIES: PickupCity[] = ["makkah", "madinah"];
-const AIRPORTS: Airport[] = ["jeddah", "madinah", "taif"];
+const AIRPORTS: Airport[] = ["jeddah", "madinah"];
 
 const ACTIVE_STATUSES: BookingStatus[] = ["driver_accepted", "driver_arriving", "driver_arrived", "trip_started"];
 
@@ -433,7 +433,7 @@ function DriverDashboard() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-card-foreground">{d.airport}</p>
-                  <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
                     {AIRPORTS.map((option) => (
                       <OptionButton key={option} selected={airport === option} label={labels.airport(option)} onClick={() => setAirport(option)} />
                     ))}

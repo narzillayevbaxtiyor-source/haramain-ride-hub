@@ -2,12 +2,12 @@ import { Check, Plane } from "lucide-react";
 import type { Airport } from "@/lib/booking";
 import { useBookingLabels } from "@/lib/booking-labels";
 
-const airports: Airport[] = ["jeddah", "madinah", "taif"];
+const airports: Airport[] = ["jeddah", "madinah"];
 
 export function AirportSelector({ value, onChange }: { value: Airport | null; onChange: (airport: Airport) => void }) {
   const labels = useBookingLabels();
   return (
-    <div className="grid gap-3 sm:grid-cols-3">
+    <div className="grid gap-3 sm:grid-cols-2">
       {airports.map((airport) => {
         const selected = value === airport;
         return (

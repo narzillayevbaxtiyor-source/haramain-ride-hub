@@ -14,9 +14,9 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Haramain 2 Airport | Makkah & Madinah Airport Transfers" },
-      { name: "description", content: "Book airport transfers from Makkah and Madinah to Jeddah, Madinah and Taif airports. Choose private or shared transportation with local drivers." },
+      { name: "description", content: "Book airport transfers from Makkah and Madinah to Jeddah and Madinah airports. Choose private or shared transportation with local drivers." },
       { property: "og:title", content: "Haramain 2 Airport | Makkah & Madinah Airport Transfers" },
-      { property: "og:description", content: "Book airport transfers from Makkah and Madinah to Jeddah, Madinah and Taif airports. Choose private or shared transportation with local drivers." },
+      { property: "og:description", content: "Book airport transfers from Makkah and Madinah to Jeddah and Madinah airports. Choose private or shared transportation with local drivers." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "/" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -28,10 +28,10 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { t } = useLanguage();
-  const routes: { from: string; to: string }[] = [
-    { from: t.makkah, to: t.jeddahAirport }, { from: t.makkah, to: t.madinahAirport }, { from: t.makkah, to: t.taifAirport },
-    { from: t.madinah, to: t.jeddahAirport }, { from: t.madinah, to: t.taifAirport },
-  ];
+const routes: { from: string; to: string }[] = [
+      { from: t.makkah, to: t.jeddahAirport }, { from: t.makkah, to: t.madinahAirport },
+      { from: t.madinah, to: t.jeddahAirport },
+    ];
   const benefits = [
     { icon: MousePointerClick, title: t.easy, text: t.easyText },
     { icon: ShieldCheck, title: t.chooseDriver, text: t.chooseDriverText },

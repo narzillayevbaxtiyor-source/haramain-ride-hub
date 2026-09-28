@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export type PickupCity = "makkah" | "madinah";
-export type Airport = "jeddah" | "madinah" | "taif";
+export type Airport = "jeddah" | "madinah";
 export type RideType = "private" | "shared";
 export type VehicleClass = "economy" | "standard" | "comfort";
 

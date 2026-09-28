@@ -632,7 +632,7 @@ export type Database = {
         | "rejected"
       commission_txn_status: "pending" | "confirmed" | "failed"
       commission_txn_type: "commission_charge" | "payment"
-      destination_airport: "jeddah" | "madinah" | "taif"
+      destination_airport: "jeddah" | "madinah"
       driver_status: "pending" | "approved" | "suspended" | "active" | "blocked"
       offer_status: "active" | "paused" | "expired"
       payment_status:
@@ -785,7 +785,7 @@ export const Constants = {
       ],
       commission_txn_status: ["pending", "confirmed", "failed"],
       commission_txn_type: ["commission_charge", "payment"],
-      destination_airport: ["jeddah", "madinah", "taif"],
+      destination_airport: ["jeddah", "madinah"],
       driver_status: ["pending", "approved", "suspended", "active", "blocked"],
       offer_status: ["active", "paused", "expired"],
       payment_status: [

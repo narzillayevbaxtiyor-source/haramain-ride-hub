@@ -8,7 +8,7 @@ export function useBookingLabels() {
   return {
     city: (city: PickupCity) => (city === "makkah" ? t.makkah : t.madinah),
     airport: (airport: Airport) =>
-      airport === "jeddah" ? t.jeddahAirport : airport === "madinah" ? t.madinahAirport : t.taifAirport,
+      airport === "jeddah" ? t.jeddahAirport : t.madinahAirport,
     ride: (ride: RideType) => (ride === "private" ? b.privateRide : b.sharedRide),
     price: (value: number) => `${Number(value).toLocaleString(language === "ar" ? "ar" : "en")} ${b.currency}`,
   };

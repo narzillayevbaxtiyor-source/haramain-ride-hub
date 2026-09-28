@@ -79,7 +79,7 @@ export function useAdminLabels() {
   };
 
   const city = (value: string) => (value === "makkah" ? a.makkah : a.madinah);
-  const airport = (value: string) => (value === "jeddah" ? a.jeddah : value === "taif" ? a.taif : a.madinahAirport);
+  const airport = (value: string) => (value === "jeddah" ? a.jeddah : a.madinahAirport);
   const rideType = (value: string) => (value === "shared" ? a.shared : a.private);
   const txnType = (value: string) => (value === "payment" ? a.typePayment : a.typeCharge);
 
