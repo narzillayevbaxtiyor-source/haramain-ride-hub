@@ -4,9 +4,9 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Airport, PickupCity, RideType } from "@/lib/booking";
 
 /** Outstanding commission (SAR) at which a driver account is blocked automatically. */
-export const COMMISSION_BLOCK_THRESHOLD = 400;
+export const COMMISSION_BLOCK_THRESHOLD = 100;
 /** Platform commission taken from completed bookings. */
-export const COMMISSION_RATE = 0.1;
+export const COMMISSION_RATE = 0.2;
 
 export type DriverStatus = "pending" | "approved" | "active" | "blocked" | "suspended";
 
